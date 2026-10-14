@@ -5,6 +5,7 @@ import { dicebearUrl, randomSeeds } from "@/lib/avatars";
 import { useI18n } from "@/lib/i18n/LocaleContext";
 import type { MessageKey } from "@/lib/i18n/translations";
 import { getSupabase } from "@/lib/supabase";
+import { useAuth } from "@/lib/auth/AuthContext";
 import { Button } from "../ui/Button";
 
 export function EmailSignIn({
@@ -17,7 +18,8 @@ export function EmailSignIn({
   onSignedIn: (hasDisplayName: boolean) => void;
 }) {
   const { t } = useI18n();
-  const [mode, setMode] = useState<"signIn" | "signUp">("signIn");
+  const { user } = useAuth();
+  const [mode, setMode] = useState<"signIn" | "signUp" | "finish">(() => user?.user_metadata?.pickle_account_pending ? "finish" : "signIn");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -35,6 +37,35 @@ export function EmailSignIn({
     }
     setBusy(true);
     setMessage(null);
+
+    if (mode === "finish") {
+      try {
+        const { data: current, error: currentError } = await getSupabase().auth.getUser();
+        if (currentError || !current.user?.email_confirmed_at || current.user.is_anonymous) {
+          setMessage({ key: "upgradeCheckEmail", tone: "info" });
+          return;
+        }
+        const { error } = await getSupabase().auth.updateUser({ password, data: { pickle_account_pending: false } });
+        if (error) throw error;
+        onSignedIn(Boolean(current.user.user_metadata?.display_name));
+      } catch { setMessage({ key: "upgradeFailed", tone: "error" }); }
+      finally { setBusy(false); }
+      return;
+    }
+
+    if (mode === "signUp" && user?.is_anonymous) {
+      try {
+        const { error } = await getSupabase().auth.updateUser({
+          email: email.trim(),
+          data: { display_name: name.trim(), avatar_url: user.user_metadata?.avatar_url ?? dicebearUrl(randomSeeds(1)[0]), pickle_account_pending: true },
+        }, { emailRedirectTo: `${window.location.origin}/dashboard` });
+        if (error) throw error;
+        setMode("finish"); setPassword("");
+        setMessage({ key: "upgradeCheckEmail", tone: "info" });
+      } catch { setMessage({ key: "upgradeFailed", tone: "error" }); }
+      finally { setBusy(false); }
+      return;
+    }
 
     if (mode === "signIn") {
       const { data, error } = await getSupabase().auth.signInWithPassword({ email: email.trim(), password });
@@ -68,8 +99,10 @@ export function EmailSignIn({
   return (
     <form onSubmit={submit}>
       <h2 id={titleId} className="text-xl font-semibold">
-        {mode === "signIn" ? t("emailTitle") : t("emailSignUpTitle")}
+        {mode === "finish" ? t("finishAccount") : mode === "signIn" ? t("emailTitle") : t("emailSignUpTitle")}
       </h2>
+      {user?.is_anonymous && mode === "signIn" && <p className="mt-3 text-sm text-ink-muted">{t("switchWarning")}</p>}
+      {mode === "finish" && <p className="mt-3 text-sm text-ink-muted">{t("finishAccountHint")}</p>}
 
       {mode === "signUp" && (
         <>
@@ -80,10 +113,10 @@ export function EmailSignIn({
         </>
       )}
 
-      <label htmlFor={emailId} className="mt-5 block text-sm font-medium">
+      {mode !== "finish" && <><label htmlFor={emailId} className="mt-5 block text-sm font-medium">
         {t("email")}
       </label>
-      <input id={emailId} type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" required className="field mt-1" />
+      <input id={emailId} type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" required className="field mt-1" /></>}
 
       <label htmlFor={passwordId} className="mt-4 block text-sm font-medium">
         {t("password")}
@@ -107,7 +140,7 @@ export function EmailSignIn({
 
       <div className="mt-6 flex flex-col gap-2">
         <Button type="submit" disabled={busy}>
-          {busy ? t("saving") : mode === "signIn" ? t("signIn") : t("signUp")}
+          {busy ? t("saving") : mode === "finish" ? t("finishAccount") : mode === "signIn" ? t("signIn") : t("signUp")}
         </Button>
         <Button variant="text" onClick={onBack}>
           {t("back")}

@@ -1,6 +1,6 @@
 # Pickle web
 
-The voter-facing web app for **Pickle** group polls. Creators make polls in the Android app and share `https://pickle-web-iota.vercel.app/p/{pollId}`. This app is what opens: voters can vote, see results and suggest options without installing anything.
+The web app for **Pickle** group polls. Creators can make and manage polls on the web or Android and share `https://pickle-web-iota.vercel.app/p/{pollId}`. Voters can vote, see results and suggest options without installing anything.
 
 - Next.js 16 (App Router) + React 19 + TypeScript + Tailwind CSS v4
 - Supabase JS v2, talking directly to the existing project (no custom backend)
@@ -12,6 +12,9 @@ The voter-facing web app for **Pickle** group polls. Creators make polls in the 
 | --- | --- |
 | `/` | Landing page with a "Get the Android app" call to action |
 | `/p/:pollId` | The poll: vote, results, suggestions, share |
+| `/create` | Create a real poll as a guest or account holder |
+| `/dashboard` | Current creator's open and closed polls |
+| `/manage/:pollId` | Owner results, suggestions, sharing, and closing |
 
 ## Setup
 
@@ -32,7 +35,7 @@ Other scripts: `npm run build`, `npm start`, `npm run lint` and `npm test` (unit
 
 ## Supabase prerequisites
 
-The schema already exists, and this app does not migrate anything. The project needs:
+The schema already exists. Creator functionality needs the additive migrations described in [creator setup and validation](docs/creator-flow.md); migrations are provided but not applied automatically. The project needs:
 
 1. **Anonymous sign-ins enabled** (Authentication → Sign In / Providers). Voters get a silent anonymous session on first visit, because every RLS policy requires `authenticated`.
 2. **Email provider enabled**, for the optional "Sign in with email".

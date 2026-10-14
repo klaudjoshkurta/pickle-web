@@ -31,6 +31,7 @@ export function StatusPills({ poll }: { poll: Poll }) {
           </time>
         </span>
       )}
+      {open && poll.closed_at && <span className="pill border-2 border-surface-variant bg-paper text-ink-muted"><ClockIcon size={15} /><time dateTime={poll.closed_at}>{t("closesOn", { date: new Date(poll.closed_at).toLocaleString(locale) })}</time></span>}
     </div>
   );
 }

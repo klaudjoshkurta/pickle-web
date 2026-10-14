@@ -20,6 +20,7 @@ export function Header({ landing = false }: { landing?: boolean }) {
       </Link>
 
       <div className="flex items-center gap-2 sm:gap-3">
+        <Link href="/dashboard" className={buttonClass("text", "px-2 text-sm")}>{t("dashboard")}</Link>
         <div role="group" aria-label={t("languageLabel")} className="flex rounded-full bg-surface-variant p-1 text-sm font-semibold">
           {LOCALES.map((l) => (
             <button

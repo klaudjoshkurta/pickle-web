@@ -22,6 +22,8 @@ export function usePoll(pollId: string, enabled: boolean, userId: string | null)
   const [state, setState] = useState<PollState>({ kind: "loading" });
   const loaded = useRef(false);
   const seq = useRef(0);
+  const identity = `${pollId}:${userId ?? ""}`;
+  const [loadedIdentity, setLoadedIdentity] = useState<string | null>(null);
 
   const refetch = useCallback((): Promise<void> => {
     // Only the most recent request may write state, so a slow background poll can't
@@ -31,16 +33,18 @@ export function usePoll(pollId: string, enabled: boolean, userId: string | null)
       (data) => {
         if (mine !== seq.current) return;
         loaded.current = true;
+        setLoadedIdentity(identity);
         setState({ kind: "ready", data });
       },
       (err) => {
         if (mine !== seq.current) return;
+        setLoadedIdentity(identity);
         if (err instanceof PollNotFoundError) setState({ kind: "notFound" });
         // Keep showing stale data on background failures; only surface errors before first load.
         else if (!loaded.current) setState({ kind: "error" });
       },
     );
-  }, [pollId]);
+  }, [pollId, identity]);
 
   const retry = useCallback(() => {
     setState({ kind: "loading" });
@@ -50,7 +54,10 @@ export function usePoll(pollId: string, enabled: boolean, userId: string | null)
   // Initial load, and reload when the signed-in user changes (their vote differs).
   useEffect(() => {
     if (!enabled) return;
+    loaded.current = false;
     void refetch();
+    const sequence = seq;
+    return () => { sequence.current++; };
   }, [enabled, refetch, userId]);
 
   useEffect(() => {
@@ -90,5 +97,13 @@ export function usePoll(pollId: string, enabled: boolean, userId: string | null)
     };
   }, [enabled, pollId, refetch]);
 
-  return { state, refetch, retry };
+  useEffect(() => {
+    if (!enabled || state.kind !== "ready" || state.data.poll.status !== "OPEN" || !state.data.poll.closed_at) return;
+    const remaining = Date.parse(state.data.poll.closed_at) - Date.now();
+    if (remaining <= 0) return;
+    const timer = setTimeout(() => void refetch(), Math.min(2147483647, remaining + 100));
+    return () => clearTimeout(timer);
+  }, [enabled, state, refetch]);
+
+  return { state: loadedIdentity !== identity ? { kind: "loading" } as PollState : state, refetch, retry };
 }

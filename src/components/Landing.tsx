@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 
 import { dicebearUrl } from "@/lib/avatars";
 import { PLAY_STORE_URL } from "@/lib/config";
@@ -44,6 +45,7 @@ function Hero() {
         <h1 className="headline-pop mt-5 text-5xl leading-[1.02] sm:text-6xl lg:text-7xl">{t("heroTitle")}</h1>
         <p className="mt-5 max-w-xl text-lg text-ink-muted">{t("heroBody")}</p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+          <Link href="/create" className={buttonClass("primary", "min-h-14 px-7 text-lg")}>{t("createPoll")}</Link>
           <a href={PLAY_STORE_URL} target="_blank" rel="noopener noreferrer" className={buttonClass("dark", "min-h-14 px-7 text-lg")}>
             <PlayIcon size={20} /> {t("ctaAndroid")}
           </a>
@@ -187,6 +189,7 @@ function ClosingCta() {
         </span>
         <h2 className="font-display text-4xl leading-tight font-bold sm:text-5xl">{t("ctaBandTitle")}</h2>
         <p className="mx-auto mt-4 max-w-md text-lg leading-relaxed">{t("ctaBandBody")}</p>
+        <Link href="/create" className={buttonClass("primary", "mt-8 min-h-14 px-8 text-lg")}>{t("createPoll")}</Link>
         <a href={PLAY_STORE_URL} target="_blank" rel="noopener noreferrer" className={buttonClass("dark", "mt-8 min-h-14 px-8 text-lg")}>
           <PlayIcon size={20} /> {t("ctaAndroid")}
         </a>

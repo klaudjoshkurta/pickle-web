@@ -1,7 +1,9 @@
+import { creatorEn, creatorEl } from "./creatorTranslations";
 export type Locale = "en" | "el";
 export const LOCALES: Locale[] = ["en", "el"];
 
 const en = {
+  ...creatorEn,
   appName: "pickle",
   languageLabel: "Language",
   getTheApp: "Get the app",
@@ -171,6 +173,7 @@ export type PluralKey = {
 }[keyof Messages];
 
 const el: Messages = {
+  ...creatorEl,
   appName: "pickle",
   languageLabel: "Γλώσσα",
   getTheApp: "Κατέβασε την εφαρμογή",
