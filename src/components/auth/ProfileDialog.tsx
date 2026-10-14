@@ -4,7 +4,7 @@ import { useId, useRef, useState } from "react";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { dicebearUrl, randomSeeds } from "@/lib/avatars";
 import { useI18n } from "@/lib/i18n/LocaleContext";
-import { supabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase";
 import { Button } from "../ui/Button";
 import { Dialog } from "../ui/Dialog";
 import { EmailSignIn } from "./EmailSignIn";
@@ -80,7 +80,7 @@ function ProfileStep({
     }
     setSaving(true);
     setError(null);
-    const { error } = await supabase.auth.updateUser({ data: { display_name: displayName, avatar_url: avatar } });
+    const { error } = await getSupabase().auth.updateUser({ data: { display_name: displayName, avatar_url: avatar } });
     setSaving(false);
     if (error) {
       setError(t("errGeneric"));
