@@ -28,7 +28,7 @@ const en = {
   // Landing — how it works
   howTitle: "Ask. Share. Decide.",
   step1Title: "Start with a question",
-  step1Body: "Create a poll in the Android app. Add your options and choose whether friends can suggest more.",
+  step1Body: "Create a poll here. Add your options and choose whether friends can suggest more.",
   step2Title: "Send it to the chat",
   step2Body: "Share your poll link wherever your group talks. Friends open it and vote. No app download needed.",
   step3Title: "Make the call",
@@ -195,7 +195,7 @@ const el: Messages = {
 
   howTitle: "Μια ερώτηση. Μια κοινή απόφαση.",
   step1Title: "Ξεκίνα με μια ερώτηση",
-  step1Body: "Φτιάξε μια ψηφοφορία στην εφαρμογή Android. Βάλε τις επιλογές σου και διάλεξε αν η παρέα μπορεί να προτείνει κι άλλες.",
+  step1Body: "Φτιάξε μια ψηφοφορία εδώ. Βάλε τις επιλογές σου και διάλεξε αν η παρέα μπορεί να προτείνει κι άλλες.",
   step2Title: "Στείλε τη στο chat",
   step2Body: "Μοιράσου τον σύνδεσμο εκεί που μιλάτε. Οι φίλοι σου τον ανοίγουν και ψηφίζουν, χωρίς να κατεβάσουν εφαρμογή.",
   step3Title: "Πάρτε την απόφαση",

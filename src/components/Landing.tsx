@@ -2,13 +2,11 @@
 import Link from "next/link";
 
 import { dicebearUrl } from "@/lib/avatars";
-import { PLAY_STORE_URL } from "@/lib/config";
 import { useI18n } from "@/lib/i18n/LocaleContext";
 import type { MessageKey } from "@/lib/i18n/translations";
 import { percentOf } from "@/lib/pollLogic";
-import { BoltIcon, CheckIcon, PlayIcon, ScaleIcon, SparkIcon, UserIcon } from "./icons";
+import { BoltIcon, CheckIcon, ScaleIcon, SparkIcon, UserIcon } from "./icons";
 import { Header } from "./Header";
-import { Wordmark } from "./Logo";
 import { LeaderCard } from "./poll/LeaderCard";
 import { ResultRows } from "./poll/ResultRows";
 import { LiveIndicator } from "./poll/ResultsFooter";
@@ -27,7 +25,6 @@ export function Landing() {
         <HowItWorks />
         <Features />
         <ClosingCta />
-        <SiteFooter />
       </main>
     </>
   );
@@ -45,10 +42,7 @@ function Hero() {
         <h1 className="headline-pop mt-5 text-5xl leading-[1.02] sm:text-6xl lg:text-7xl">{t("heroTitle")}</h1>
         <p className="mt-5 max-w-xl text-lg text-ink-muted">{t("heroBody")}</p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <Link href="/create" className={buttonClass("primary", "min-h-14 px-7 text-lg")}>{t("createPoll")}</Link>
-          <a href={PLAY_STORE_URL} target="_blank" rel="noopener noreferrer" className={buttonClass("dark", "min-h-14 px-7 text-lg")}>
-            <PlayIcon size={20} /> {t("ctaAndroid")}
-          </a>
+          <Link href="/creator/auth" className={buttonClass("primary", "min-h-14 px-7 text-lg")}>{t("createPoll")}</Link>
           <a href="#how" className={buttonClass("text", "min-h-14 px-7 text-lg")}>
             {t("ctaHow")}
           </a>
@@ -189,22 +183,9 @@ function ClosingCta() {
         </span>
         <h2 className="font-display text-4xl leading-tight font-bold sm:text-5xl">{t("ctaBandTitle")}</h2>
         <p className="mx-auto mt-4 max-w-md text-lg leading-relaxed">{t("ctaBandBody")}</p>
-        <Link href="/create" className={buttonClass("primary", "mt-8 min-h-14 px-8 text-lg")}>{t("createPoll")}</Link>
-        <a href={PLAY_STORE_URL} target="_blank" rel="noopener noreferrer" className={buttonClass("dark", "mt-8 min-h-14 px-8 text-lg")}>
-          <PlayIcon size={20} /> {t("ctaAndroid")}
-        </a>
+        <Link href="/creator/auth" className={buttonClass("primary", "mt-8 min-h-14 px-8 text-lg")}>{t("createPoll")}</Link>
         <p className="mt-6 text-sm">{t("landingHint")}</p>
       </div>
     </section>
-  );
-}
-
-function SiteFooter() {
-  const { t } = useI18n();
-  return (
-    <footer className="mx-auto mt-auto flex w-full max-w-6xl flex-col items-center justify-between gap-3 px-4 py-8 text-sm text-ink-muted sm:flex-row sm:px-6">
-      <Wordmark />
-      <p>{t("footerMadeWith")}</p>
-    </footer>
   );
 }

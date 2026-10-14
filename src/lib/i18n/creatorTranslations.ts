@@ -1,4 +1,5 @@
 export const creatorEn = {
+  continueAsGuest: "Continue as a guest",
   creatorBackendMissing: "Creator features need the supplied database migrations. Ask the project administrator to review and apply them.", suggestionUnavailable: "This suggestion has already been reviewed or is no longer available. Results are being refreshed.",
   uncertainCreation: "Creation may have succeeded. Retry to recover the same poll before editing this draft.",
   createPoll: "Create poll", dashboard: "My polls", guestWarning: "You’re creating as a guest. Clearing browser storage or losing this session can mean losing access to manage your polls.",
@@ -19,6 +20,7 @@ export const creatorEn = {
   upgradeCheckEmail: "Check your email to verify this address, then return here to set your password. Keep this guest session.", upgradeFailed: "Could not save this guest account. Check that anonymous identity linking is enabled and try again.",
 };
 export const creatorEl: typeof creatorEn = {
+  continueAsGuest: "Συνέχεια ως επισκέπτης",
   creatorBackendMissing: "Οι λειτουργίες δημιουργού χρειάζονται τις παρεχόμενες ενημερώσεις βάσης. Ζήτησε από τον διαχειριστή να τις ελέγξει και να τις εφαρμόσει.", suggestionUnavailable: "Η πρόταση έχει ήδη ελεγχθεί ή δεν είναι διαθέσιμη. Τα αποτελέσματα ενημερώνονται.",
   uncertainCreation: "Η δημιουργία μπορεί να πέτυχε. Δοκίμασε ξανά για να ανακτήσεις την ίδια ψηφοφορία πριν αλλάξεις το πρόχειρο.",
   createPoll: "Νέα ψηφοφορία", dashboard: "Οι ψηφοφορίες μου", guestWarning: "Δημιουργείς ως επισκέπτης. Αν διαγράψεις τα δεδομένα του browser ή χάσεις τη συνεδρία, μπορεί να χάσεις την πρόσβαση διαχείρισης.",
