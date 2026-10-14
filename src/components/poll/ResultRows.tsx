@@ -14,10 +14,10 @@ export interface ResultRowData {
 }
 
 /** Outlined card of options with dashed dividers, teal bars, percentage and vote count. */
-export function ResultRows({ rows, avatarUrl }: { rows: ResultRowData[]; avatarUrl?: string | null }) {
+export function ResultRows({ rows, avatarUrl, appearance = "outlined" }: { rows: ResultRowData[]; avatarUrl?: string | null; appearance?: "outlined" | "soft" }) {
   if (rows.length === 0) return null;
   return (
-    <ul className="@container card divide-y-2 divide-dashed divide-surface-variant overflow-hidden">
+    <ul className={`@container divide-surface-variant overflow-hidden ${appearance === "soft" ? "rounded-card bg-paper divide-y" : "card divide-y-2 divide-dashed"}`}>
       {rows.map((row) => (
         <ResultRow key={row.id} row={row} avatarUrl={avatarUrl} />
       ))}

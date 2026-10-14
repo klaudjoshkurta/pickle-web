@@ -5,6 +5,7 @@ import { segments } from "@/lib/pollLogic";
 import { CheckIcon } from "../icons";
 
 interface LeaderCardProps {
+  appearance?: "outlined" | "soft";
   text: string;
   count: number;
   total: number;
@@ -17,16 +18,16 @@ interface LeaderCardProps {
 }
 
 /** The highlighted top option: tomato card, mustard corner ribbon, big percentage and per-vote segments. */
-export function LeaderCard({ text, count, total, percent, margin, ribbon, isMine, suggestedByYou, avatarUrl }: LeaderCardProps) {
+export function LeaderCard({ text, count, total, percent, margin, ribbon, isMine, suggestedByYou, avatarUrl, appearance = "outlined" }: LeaderCardProps) {
   const { t } = useI18n();
   const seg = segments(count, total);
 
   return (
     <section
       aria-label={`${ribbon === "winner" ? t("winner") : t("inTheLead")}: ${text}`}
-      className="relative overflow-hidden rounded-card border-2 border-ink bg-tomato p-5 text-white sm:p-7"
+      className={`relative overflow-hidden rounded-card bg-tomato p-5 text-white sm:p-7 ${appearance === "soft" ? "" : "border-2 border-ink"}`}
     >
-      <Ribbon>{ribbon === "winner" ? t("winner") : t("inTheLead")}</Ribbon>
+      <Ribbon appearance={appearance}>{ribbon === "winner" ? t("winner") : t("inTheLead")}</Ribbon>
 
       <h2 className="pr-20 font-display text-2xl leading-tight font-bold wrap-break-word sm:pr-28 sm:text-[1.75rem]">{text}</h2>
 
@@ -86,11 +87,11 @@ export function TieCard({ names, count }: { names: string[]; count: number }) {
   );
 }
 
-function Ribbon({ children }: { children: React.ReactNode }) {
+function Ribbon({ children, appearance = "outlined" }: { children: React.ReactNode; appearance?: "outlined" | "soft" }) {
   return (
     <span
       aria-hidden
-      className="pointer-events-none absolute top-6 -right-14 w-56 rotate-38 border-y-2 border-ink bg-mustard py-1.5 text-center font-display text-sm font-bold tracking-wider text-ink uppercase sm:top-7 sm:-right-12"
+      className={`pointer-events-none absolute top-6 -right-14 w-56 rotate-38 bg-mustard py-1.5 text-center font-display text-sm font-bold tracking-wider text-ink uppercase sm:top-7 sm:-right-12 ${appearance === "soft" ? "" : "border-y-2 border-ink"}`}
     >
       {children}
     </span>
