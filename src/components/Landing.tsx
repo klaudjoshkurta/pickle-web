@@ -77,7 +77,7 @@ function DemoPoll() {
         <AvatarStack />
         <p className="font-display text-lg leading-tight font-bold">{t("demoQuestion")}</p>
       </div>
-      <div className="relative -rotate-1 transition-transform duration-500 hover:rotate-0 motion-reduce:transition-none">
+      <div className="relative">
         <LeaderCard
           text={t("demoOption1")}
           count={DEMO_VOTES[0]}
@@ -85,11 +85,10 @@ function DemoPoll() {
           percent={percentOf(DEMO_VOTES[0], DEMO_TOTAL)}
           margin={DEMO_VOTES[0] - DEMO_VOTES[1]}
           ribbon="lead"
-          appearance="soft"
         />
       </div>
-      <div className="relative mt-4 rotate-[0.6deg]">
-        <ResultRows rows={rows} appearance="soft" />
+      <div className="relative mt-5">
+        <ResultRows rows={rows} barMaxCount={DEMO_VOTES[0]} />
       </div>
       <div className="mt-4 flex justify-end">
         <span className="px-2 py-1">

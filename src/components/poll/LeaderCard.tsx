@@ -50,12 +50,12 @@ export function LeaderCard({ text, count, total, percent, margin, ribbon, isMine
         </div>
       )}
 
-      <div className="mt-5 flex flex-wrap items-end justify-between gap-3">
+      <div className="mt-7 flex flex-wrap items-end justify-between gap-3">
         <p className="font-display leading-none font-bold">
           <span className="text-6xl tabular-nums">{percent}</span>
-          <span className="align-top text-2xl">%</span>
+          <span className="align-top text-xl">%</span>
         </p>
-        <p className="pill bg-tomato-deep text-white">
+        <p className="rounded-2xl bg-tomato-deep px-4 py-2 text-sm font-semibold text-white">
           <span>{t("leaderVotes", { x: count, n: total })}</span>
           {margin > 0 && <span className="font-medium text-white/90">· {t("aheadBy", { n: margin })}</span>}
         </p>

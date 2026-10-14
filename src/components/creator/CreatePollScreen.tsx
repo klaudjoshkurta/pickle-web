@@ -114,7 +114,10 @@ function CreateForm() {
           {switches.filter(([key]) => key !== "requireApproval" || draft.allowSuggestions).map(([key, label, description]) => (
             <label key={key} className="flex min-h-20 cursor-pointer items-center justify-between gap-4 p-4">
               <span><span className="block font-semibold">{t(label)}</span><span id={`${key}-description`} className="mt-1 block text-sm text-ink-muted">{t(description)}</span></span>
-              <input type="checkbox" role="switch" className="h-6 w-6 shrink-0 accent-primary" aria-describedby={`${key}-description`} checked={draft[key]} onChange={(e) => update({ [key]: e.target.checked })} />
+              <span className="relative shrink-0">
+                <input type="checkbox" role="switch" className="peer sr-only" aria-describedby={`${key}-description`} checked={draft[key]} onChange={(e) => update({ [key]: e.target.checked })} />
+                <span aria-hidden className="block h-7 w-12 rounded-full border-2 border-ink bg-surface-variant transition-colors after:absolute after:left-1 after:top-1 after:h-5 after:w-5 after:rounded-full after:bg-paper after:transition-transform peer-checked:bg-primary peer-checked:after:translate-x-5 peer-focus-visible:ring-2 peer-focus-visible:ring-primary peer-focus-visible:ring-offset-2" />
+              </span>
             </label>
           ))}
           <div className="flex items-center justify-between gap-4 p-4">

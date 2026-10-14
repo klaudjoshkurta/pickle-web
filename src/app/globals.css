@@ -10,20 +10,20 @@
   --color-track: #efe2c8;
   --color-ink: #3a2417;
   --color-ink-muted: #6b5546;
-  --color-primary: #007564;
+  --color-primary: #22786a;
   --color-primary-hover: #005e50;
   --color-primary-soft: #cfe7e1;
   --color-on-primary: #ffffff;
-  --color-tomato: #e0532b;
+  --color-tomato: #e5532b;
   --color-tomato-deep: #b63c1a;
   --color-tomato-dim: #c4441f;
   --color-mustard: #f3c24f;
   --color-danger: #b3261e;
 
   --font-sans: var(--font-google-sans), system-ui, sans-serif;
-  --font-display: var(--font-google-sans), system-ui, sans-serif;
+  --font-display: var(--font-fredoka), var(--font-google-sans), system-ui, sans-serif;
 
-  --radius-card: 1.25rem;
+  --radius-card: 1.5rem;
   --shadow-pop: 3px 3px 0 var(--color-mustard);
 }
 
@@ -39,11 +39,12 @@ body {
   letter-spacing: -0.01em;
 }
 
-/* Bold headline typography. */
+/* Rounded headings and the mustard offset shadow from the supplied reference. */
 @utility headline-pop {
   font-family: var(--font-display);
   font-weight: 700;
   letter-spacing: -0.015em;
+  text-shadow: 2px 3px 0 var(--color-mustard);
 }
 
 @layer components {
@@ -51,7 +52,7 @@ body {
     @apply rounded-card border-2 border-ink bg-paper;
   }
   .field {
-    @apply block min-h-12 w-full rounded-full border-2 border-ink bg-surface px-5 text-base text-ink placeholder:text-ink-muted/70 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-paper aria-invalid:border-danger;
+    @apply block min-h-12 w-full rounded-2xl border-2 border-ink bg-paper px-5 text-base text-ink placeholder:text-ink-muted/70 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-paper aria-invalid:border-danger;
   }
   .link {
     @apply rounded font-semibold text-primary underline underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary;
@@ -59,6 +60,19 @@ body {
   .pill {
     @apply inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold;
   }
+}
+
+.suggestion-callout::before {
+  content: "";
+  position: absolute;
+  top: -11px;
+  left: 32px;
+  width: 20px;
+  height: 20px;
+  transform: rotate(45deg);
+  border-top: 2px solid var(--color-ink);
+  border-left: 2px solid var(--color-ink);
+  background: var(--color-paper);
 }
 
 /* Result bars grow from 0 when revealed, then ease between values on live updates. */

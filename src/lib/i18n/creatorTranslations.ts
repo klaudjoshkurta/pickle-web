@@ -1,4 +1,6 @@
 export const creatorEn = {
+  closesTodayAt: "Closes today at {time}",
+  suggestedIdea: "Suggested: “{idea}”", approveIdeaHint: "Approve it and it joins with 0 votes — your call, house rules.", addIt: "Add it", notThisTime: "Not this time", suggestedOption: "Suggested option",
   newPoll: "New poll", createGetLink: "Create & get the link", questionPlaceholder: "Pizza night: what are we ordering?", filledOptions: "{n} of {max}", optionsHint: "Need at least 2 distinct options, up to 10.", whenVotingCloses: "When does voting close?", howPeopleVote: "How do people vote?", votersSuggest: "Voters can suggest options", suggestionsDescription: "Let the crew add ideas", approveFirst: "Approve suggestions first", approvalDescription: "You approve each one before it joins", earlyResultsDescription: "Off = results only after you vote, no bandwagons", voteChangeDescription: "Voters can switch while the poll is open", expectedDescription: "Optional, shows turnout on the poll. Zero means unknown.",
   continueAsGuest: "Continue as a guest",
   creatorBackendMissing: "Creator features need the supplied database migrations. Ask the project administrator to review and apply them.", suggestionUnavailable: "This suggestion has already been reviewed or is no longer available. Results are being refreshed.",
@@ -21,6 +23,8 @@ export const creatorEn = {
   upgradeCheckEmail: "Check your email to verify this address, then return here to set your password. Keep this guest session.", upgradeFailed: "Could not save this guest account. Check that anonymous identity linking is enabled and try again.",
 };
 export const creatorEl: typeof creatorEn = {
+  closesTodayAt: "Κλείνει σήμερα στις {time}",
+  suggestedIdea: "Πρόταση: «{idea}»", approveIdeaHint: "Αν την εγκρίνεις, προστίθεται με 0 ψήφους — εσύ αποφασίζεις.", addIt: "Προσθήκη", notThisTime: "Όχι αυτή τη φορά", suggestedOption: "Προτεινόμενη επιλογή",
   newPoll: "Νέα ψηφοφορία", createGetLink: "Δημιουργία & λήψη συνδέσμου", questionPlaceholder: "Βραδιά πίτσας: τι παραγγέλνουμε;", filledOptions: "{n} από {max}", optionsHint: "Χρειάζονται τουλάχιστον 2 διαφορετικές επιλογές, έως 10.", whenVotingCloses: "Πότε κλείνει η ψηφοφορία;", howPeopleVote: "Πώς ψηφίζει η παρέα;", votersSuggest: "Οι ψηφοφόροι μπορούν να προτείνουν επιλογές", suggestionsDescription: "Άφησε την παρέα να προσθέσει ιδέες", approveFirst: "Έγκριση προτάσεων πρώτα", approvalDescription: "Εγκρίνεις κάθε πρόταση πριν προστεθεί", earlyResultsDescription: "Ανενεργό = αποτελέσματα μόνο αφού ψηφίσεις", voteChangeDescription: "Οι ψηφοφόροι μπορούν να αλλάξουν ψήφο όσο είναι ανοιχτή", expectedDescription: "Προαιρετικό, δείχνει συμμετοχή. Το μηδέν σημαίνει άγνωστο πλήθος.",
   continueAsGuest: "Συνέχεια ως επισκέπτης",
   creatorBackendMissing: "Οι λειτουργίες δημιουργού χρειάζονται τις παρεχόμενες ενημερώσεις βάσης. Ζήτησε από τον διαχειριστή να τις ελέγξει και να τις εφαρμόσει.", suggestionUnavailable: "Η πρόταση έχει ήδη ελεγχθεί ή δεν είναι διαθέσιμη. Τα αποτελέσματα ενημερώνονται.",
