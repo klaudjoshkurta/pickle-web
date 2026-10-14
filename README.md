@@ -1,6 +1,6 @@
 # Pickle web
 
-The voter-facing web app for **Pickle** group polls. Creators make polls in the Android app and share `https://pickle.app/p/{pollId}`. This app is what opens: voters can vote, see results and suggest options without installing anything.
+The voter-facing web app for **Pickle** group polls. Creators make polls in the Android app and share `https://pickle-web-iota.vercel.app/p/{pollId}`. This app is what opens: voters can vote, see results and suggest options without installing anything.
 
 - Next.js 16 (App Router) + React 19 + TypeScript + Tailwind CSS v4
 - Supabase JS v2, talking directly to the existing project (no custom backend)
@@ -50,12 +50,12 @@ Next serves `/p/[pollId]` itself, so a refresh on a poll URL works without the S
 ### Vercel
 1. Import the repo. The Next.js framework preset is detected automatically.
 2. Add `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` under Settings → Environment Variables (Production and Preview).
-3. Deploy, then point `pickle.app` at the project under Settings → Domains.
+3. Deploy. The app currently runs at `https://pickle-web-iota.vercel.app`; to move to a custom domain, add it under Settings → Domains and update `SHARE_BASE`.
 
 ### Netlify
 1. Import the repo. Netlify detects Next.js and uses its Next.js runtime (build command `npm run build`; leave the publish directory to the runtime).
 2. Add the same two environment variables under Site configuration → Environment variables.
-3. Deploy and attach the `pickle.app` domain.
+3. Deploy, and attach a custom domain if you have one (then update `SHARE_BASE`).
 
 No `_redirects` or `vercel.json` rewrite is needed on either platform.
 
