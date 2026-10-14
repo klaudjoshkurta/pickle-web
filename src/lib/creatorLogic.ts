@@ -23,11 +23,22 @@ export function cleanOptions(options: string[]) {
     return true;
   });
 }
+/** Android's numeric field discards non-digits and keeps at most four digits. */
+export function sanitizeExpectedVoters(value: string): string {
+  return value.replace(/\D/g, "").slice(0, 4);
+}
+export function expectedVoterCount(value: string): number | null {
+  const count = Number(value);
+  return Number.isInteger(count) && count > 0 ? count : null;
+}
+export function isValidPollInput(draft: Pick<PollDraft, "question" | "options">): boolean {
+  return !!draft.question.trim() && draft.options.length <= 10 && cleanOptions(draft.options).length >= 2;
+}
 export function validateDraft(draft: PollDraft): "questionRequired" | "optionsRequired" | "expectedInvalid" | null {
   if (!draft.question.trim()) return "questionRequired";
   if (draft.options.length > 10 || cleanOptions(draft.options).length < 2) return "optionsRequired";
   const value = draft.expectedVoters.trim();
-  if (value && (!/^\d+$/.test(value) || Number(value) < 1 || Number(value) > 2147483647)) return "expectedInvalid";
+  if (value && !/^\d{1,4}$/.test(value)) return "expectedInvalid";
   return null;
 }
 export function restoreDraft(raw: string | null): PollDraft {

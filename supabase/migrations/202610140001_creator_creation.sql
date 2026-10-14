@@ -45,6 +45,9 @@ begin
   insert into public.poll_options(poll_id, text, status, vote_count)
   select v_poll, text, 'APPROVED', 0 from pg_catalog.unnest(v_options) as texts(text);
   insert into public.poll_creation_requests values (v_user, p_request_id, v_poll);
+  -- Match Android's creation notification without duplicating it on retries.
+  insert into public.notifications(user_id, type, poll_id, poll_question)
+  values (v_user, 'POLL_CREATED', v_poll, pg_catalog.btrim(p_question));
   return v_poll;
 end;
 $$;

@@ -1,6 +1,12 @@
 # Creator flow setup and validation
 
 The web app now supports `/create`, `/dashboard`, and `/manage/[pollId]`.
+The create form follows the supplied Android source: multiline question,
+2–10 option fields with a distinct-option count, deadline pills, descriptive
+voting switches, conditional approval settings, and a persistent creation action.
+Expected-voter input keeps four digits; blank or zero is persisted as unknown.
+The atomic creation migration also records Android's `POLL_CREATED` notification
+once per successful creation, including when creation is retried.
 Public links remain `pollShareUrl(id)` → the existing `/p/{id}` domain.
 All data access uses the persisted Supabase browser session and public key.
 No service-role credential is needed in the web app.

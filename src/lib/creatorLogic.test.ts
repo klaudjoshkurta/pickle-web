@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { cleanOptions, DEADLINES, deadlinePassed, emptyDraft, restoreDraft, validateDraft } from "./creatorLogic";
+import { cleanOptions, DEADLINES, deadlinePassed, emptyDraft, expectedVoterCount, isValidPollInput, restoreDraft, sanitizeExpectedVoters, validateDraft } from "./creatorLogic";
 describe("creator validation and recovery", () => {
   const valid = () => ({ ...emptyDraft(), question: "Dinner?", options: ["Pizza", "Soup"] });
   it("uses the product defaults", () => {
@@ -13,11 +13,25 @@ describe("creator validation and recovery", () => {
     expect(validateDraft({ ...valid(), options: Array.from({ length: 11 }, (_, i) => String(i)) })).toBe("optionsRequired");
     expect(validateDraft(valid())).toBeNull();
   });
-  it.each(["0", "-1", "1.5", "1e3", "abc", "2147483648"])("rejects expected count %s", (expectedVoters) => {
+  it.each(["-1", "1.5", "1e3", "abc", "10000", "2147483648"])("rejects expected count %s", (expectedVoters) => {
     expect(validateDraft({ ...valid(), expectedVoters })).toBe("expectedInvalid");
   });
-  it.each(["", "  ", "1", "2147483647"])("accepts optional expected count %s", (expectedVoters) => {
+  it.each(["", "  ", "0", "1", "9999"])("accepts optional expected count %s", (expectedVoters) => {
     expect(validateDraft({ ...valid(), expectedVoters })).toBeNull();
+  });
+  it("matches Android's numeric input and unknown turnout", () => {
+    expect(sanitizeExpectedVoters("1a2b345")).toBe("1234");
+    expect(sanitizeExpectedVoters("" )).toBe("");
+    expect(expectedVoterCount("0")).toBeNull();
+    expect(expectedVoterCount("0000")).toBeNull();
+    expect(expectedVoterCount("" )).toBeNull();
+    expect(expectedVoterCount("0012")).toBe(12);
+    expect(expectedVoterCount("9999")).toBe(9999);
+  });
+  it("enables creation only with a question and two distinct options", () => {
+    expect(isValidPollInput(emptyDraft())).toBe(false);
+    expect(isValidPollInput({ question: "Q", options: ["A", " a "] })).toBe(false);
+    expect(isValidPollInput({ question: "Q", options: [" A ", " B ", ""] })).toBe(true);
   });
   it("recovers a valid draft and request key, excluding unknown fields", () => {
     const draft = { ...valid(), requestId: "00000000-0000-4000-8000-000000000001" };

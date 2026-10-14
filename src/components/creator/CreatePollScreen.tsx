@@ -1,12 +1,13 @@
 "use client";
+import Link from "next/link";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { createPoll, creatorErrorKey } from "@/lib/creatorApi";
-import { DEADLINES, DRAFT_KEY, emptyDraft, restoreDraft, validateDraft, type PollDraft } from "@/lib/creatorLogic";
+import { cleanOptions, DEADLINES, DRAFT_KEY, emptyDraft, isValidPollInput, restoreDraft, sanitizeExpectedVoters, validateDraft, type PollDraft } from "@/lib/creatorLogic";
 import { useI18n } from "@/lib/i18n/LocaleContext";
 import type { MessageKey } from "@/lib/i18n/translations";
 import { useAuth } from "@/lib/auth/AuthContext";
-import { Button } from "../ui/Button";
+import { Button, buttonClass } from "../ui/Button";
 
 const subscribe = () => () => {};
 export function CreatePollScreen() {
@@ -55,7 +56,7 @@ function CreateForm() {
       const pollId = await createPoll(payload);
       if (!alive.current) return;
       try { localStorage.removeItem(storageKey); } catch { /* Creation already succeeded. */ }
-      router.push(`/manage/${pollId}`);
+      router.replace(`/manage/${pollId}`);
     } catch (err) {
       if (!alive.current) return;
       // A structured database rejection means the transaction did not commit.
@@ -66,32 +67,68 @@ function CreateForm() {
   }
   const deadlineKeys: MessageKey[] = ["deadlineNone", "deadlineHour", "deadlineDay", "deadlineThreeDays", "deadlineWeek"];
   const frozen = busy || !!draft.requestId;
-  return <form onSubmit={submit} noValidate className="flex flex-col gap-6" aria-busy={busy}>
-    <h1 className="headline-pop text-4xl">{t("createPoll")}</h1>
-    <fieldset disabled={frozen} className="card flex flex-col gap-4 p-5 sm:p-7">
-      <label htmlFor="question" className="font-semibold">{t("question")}</label>
-      <input id="question" className="field" value={draft.question} onChange={(e) => update({ question: e.target.value })} required aria-invalid={error === "questionRequired"} aria-describedby={error === "questionRequired" ? "create-error" : undefined} />
-      <h2 className="font-semibold">{t("options")}</h2>
-      {draft.options.map((value, i) => <div key={i} className="flex items-end gap-2">
-        <div className="flex-1"><label htmlFor={`option-${i}`} className="mb-1 block text-sm">{t("optionLabel", { n: i + 1 })}</label>
-          <input id={`option-${i}`} className="field" value={value} onChange={(e) => update({ options: draft.options.map((s, n) => n === i ? e.target.value : s) })} aria-invalid={error === "optionsRequired"} aria-describedby={error === "optionsRequired" ? "create-error" : undefined} /></div>
-        <Button variant="text" disabled={draft.options.length <= 2} aria-label={t("removeOption", { n: i + 1 })} onClick={() => update({ options: draft.options.filter((_, n) => n !== i) })}>×</Button>
-      </div>)}
-      <Button variant="outline" disabled={draft.options.length >= 10} onClick={() => update({ options: [...draft.options, ""] })}>{t("addOption")}</Button>
-    </fieldset>
-    <fieldset disabled={frozen} className="card flex flex-col gap-4 p-5 sm:p-7">
-      <legend className="px-2 font-semibold">{t("settings")}</legend>
-      {([ ["allowSuggestions", "allowSuggestions"], ["requireApproval", "requireApproval"], ["showResults", "showEarlyResults"], ["allowVoteChange", "allowVoteChange"] ] as const).map(([key, label]) => <label key={key} className="flex min-h-11 items-center gap-3">
-        <input type="checkbox" className="h-5 w-5 accent-primary" checked={draft[key]} disabled={key === "requireApproval" && !draft.allowSuggestions} onChange={(e) => update({ [key]: e.target.checked })} />{t(label)}
-      </label>)}
-      <label htmlFor="deadline" className="font-semibold">{t("deadline")}</label>
-      <select id="deadline" className="field" value={draft.deadline} onChange={(e) => update({ deadline: Number(e.target.value) })}>{DEADLINES.map((n, i) => <option key={n} value={n}>{t(deadlineKeys[i])}</option>)}</select>
-      <label htmlFor="expected" className="font-semibold">{t("expectedVoters")}</label>
-      <input id="expected" inputMode="numeric" className="field" value={draft.expectedVoters} onChange={(e) => update({ expectedVoters: e.target.value })} aria-invalid={error === "expectedInvalid"} aria-describedby={error === "expectedInvalid" ? "create-error" : undefined} />
-    </fieldset>
-    <p role="status" className="text-sm text-ink-muted">{t(storageFailed ? "draftUnavailable" : "draftHint")}</p>
-    {error && <p id="create-error" role="alert" className="text-danger">{t(error)}</p>}
-    {!busy && draft.requestId && <p role="status" className="text-sm text-ink-muted">{t("uncertainCreation")}</p>}
-    <Button type="submit" disabled={busy}>{t(busy ? "creating" : draft.requestId ? "retry" : "createPoll")}</Button>
-  </form>;
+  const filledOptions = cleanOptions(draft.options).length;
+  const switches = [
+    ["allowSuggestions", "votersSuggest", "suggestionsDescription"],
+    ["requireApproval", "approveFirst", "approvalDescription"],
+    ["showResults", "showEarlyResults", "earlyResultsDescription"],
+    ["allowVoteChange", "allowVoteChange", "voteChangeDescription"],
+  ] as const;
+  return (
+    <form onSubmit={submit} noValidate className="mx-auto flex w-full max-w-2xl flex-col gap-6" aria-busy={busy}>
+      <div className="flex items-center justify-between gap-4">
+        <h1 className="headline-pop text-4xl">{t("newPoll")}</h1>
+        <Link href="/dashboard" className={buttonClass("text")}>{t("cancel")}</Link>
+      </div>
+      <fieldset disabled={frozen} className="flex flex-col gap-4">
+        <label htmlFor="question" className="font-semibold">{t("question")}</label>
+        <textarea id="question" className="field min-h-24 rounded-2xl py-3" rows={2} placeholder={t("questionPlaceholder")} value={draft.question} onChange={(e) => update({ question: e.target.value })} required aria-invalid={error === "questionRequired"} aria-describedby={error === "questionRequired" ? "create-error" : undefined} />
+        <div className="mt-2 flex items-center justify-between">
+          <h2 className="font-semibold">{t("options")}</h2>
+          <span className="text-sm text-ink-muted" aria-live="polite">{t("filledOptions", { n: filledOptions, max: 10 })}</span>
+        </div>
+        {draft.options.map((value, i) => (
+          <div key={i} className="flex items-center gap-2">
+            <label htmlFor={`option-${i}`} className="sr-only">{t("optionLabel", { n: i + 1 })}</label>
+            <input id={`option-${i}`} className="field min-w-0 flex-1" placeholder={t("optionLabel", { n: i + 1 })} value={value} onChange={(e) => update({ options: draft.options.map((s, n) => n === i ? e.target.value : s) })} aria-invalid={error === "optionsRequired"} aria-describedby="options-hint" />
+            {draft.options.length > 2 && <Button variant="text" aria-label={t("removeOption", { n: i + 1 })} onClick={() => update({ options: draft.options.filter((_, n) => n !== i) })}>×</Button>}
+          </div>
+        ))}
+        <Button variant="outline" className="border-dashed text-primary" disabled={draft.options.length >= 10} onClick={() => update({ options: [...draft.options, ""] })}>+ {t("addOption")}</Button>
+        <p id="options-hint" className="text-sm text-ink-muted">{t("optionsHint")}</p>
+      </fieldset>
+      <fieldset disabled={frozen}>
+        <legend className="mb-3 font-semibold">{t("whenVotingCloses")}</legend>
+        <div className="flex flex-wrap gap-2">
+          {DEADLINES.map((n, i) => (
+            <label key={n} className="cursor-pointer">
+              <input type="radio" name="deadline" value={n} checked={draft.deadline === n} onChange={() => update({ deadline: n })} className="peer sr-only" />
+              <span className="inline-flex min-h-11 items-center rounded-full border-2 border-ink bg-paper px-4 text-sm font-semibold peer-checked:bg-primary peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-primary peer-focus-visible:ring-offset-2 peer-disabled:cursor-not-allowed peer-disabled:opacity-50">{t(deadlineKeys[i])}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+      <fieldset disabled={frozen}>
+        <legend className="mb-3 font-semibold">{t("howPeopleVote")}</legend>
+        <div className="card divide-y divide-surface-variant overflow-hidden">
+          {switches.filter(([key]) => key !== "requireApproval" || draft.allowSuggestions).map(([key, label, description]) => (
+            <label key={key} className="flex min-h-20 cursor-pointer items-center justify-between gap-4 p-4">
+              <span><span className="block font-semibold">{t(label)}</span><span id={`${key}-description`} className="mt-1 block text-sm text-ink-muted">{t(description)}</span></span>
+              <input type="checkbox" role="switch" className="h-6 w-6 shrink-0 accent-primary" aria-describedby={`${key}-description`} checked={draft[key]} onChange={(e) => update({ [key]: e.target.checked })} />
+            </label>
+          ))}
+          <div className="flex items-center justify-between gap-4 p-4">
+            <div><label htmlFor="expected" className="font-semibold">{t("expectedVoters")}</label><p id="expected-hint" className="mt-1 text-sm text-ink-muted">{t("expectedDescription")}</p></div>
+            <input id="expected" inputMode="numeric" maxLength={4} placeholder="–" className="field w-24 shrink-0 rounded-xl px-3 text-center" value={draft.expectedVoters} onChange={(e) => update({ expectedVoters: sanitizeExpectedVoters(e.target.value) })} aria-invalid={error === "expectedInvalid"} aria-describedby={error === "expectedInvalid" ? "create-error expected-hint" : "expected-hint"} />
+          </div>
+        </div>
+      </fieldset>
+      <p role="status" className="text-sm text-ink-muted">{t(storageFailed ? "draftUnavailable" : "draftHint")}</p>
+      {error && <p id="create-error" role="alert" className="text-danger">{t(error)}</p>}
+      {!busy && draft.requestId && <p role="status" className="text-sm text-ink-muted">{t("uncertainCreation")}</p>}
+      <div className="sticky bottom-0 z-10 border-t border-surface-variant bg-cream py-3">
+        <Button type="submit" className="w-full" disabled={busy || !isValidPollInput(draft)}>{t(busy ? "creating" : draft.requestId ? "retry" : "createGetLink")}</Button>
+      </div>
+    </form>
+  );
 }

@@ -11,6 +11,11 @@ beforeEach(() => {
   mocks.from.mockReturnValue(chain);
 });
 describe("creator API boundaries", () => {
+  it("persists zero expected voters as unknown, like Android", async () => {
+    mocks.rpc.mockResolvedValue({ data: id, error: null });
+    await createPoll({ ...emptyDraft(), question: "Q", options: ["A", "B"], expectedVoters: "0", requestId: id });
+    expect(mocks.rpc.mock.calls[0][1].p_expected_voters).toBeNull();
+  });
   it("maps recoverable backend, session and moderation errors", () => {
     expect(creatorErrorKey({ code: "PGRST202" })).toBe("creatorBackendMissing");
     expect(creatorErrorKey({ message: "Authentication required" })).toBe("sessionUnavailable");

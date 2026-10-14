@@ -1,5 +1,5 @@
 import { getSupabase } from "./supabase";
-import { cleanOptions, deadlinePassed, validateDraft, type PollDraft } from "./creatorLogic";
+import { cleanOptions, deadlinePassed, expectedVoterCount, validateDraft, type PollDraft } from "./creatorLogic";
 import { isUuid } from "./pollLogic";
 import { PollNotFoundError } from "./pollApi";
 import type { Poll, PollOption } from "./types";
@@ -63,7 +63,7 @@ export async function createPoll(draft: PollDraft): Promise<string> {
     p_allow_suggestions: draft.allowSuggestions, p_require_approval: draft.requireApproval,
     p_show_results_before_voting: draft.showResults, p_allow_vote_change: draft.allowVoteChange,
     p_deadline_seconds: draft.deadline || null,
-    p_expected_voters: draft.expectedVoters.trim() ? Number(draft.expectedVoters) : null,
+    p_expected_voters: expectedVoterCount(draft.expectedVoters),
     p_request_id: draft.requestId,
   });
   if (error) throw error;

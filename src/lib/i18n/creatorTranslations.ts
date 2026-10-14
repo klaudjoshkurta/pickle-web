@@ -1,4 +1,5 @@
 export const creatorEn = {
+  newPoll: "New poll", createGetLink: "Create & get the link", questionPlaceholder: "Pizza night: what are we ordering?", filledOptions: "{n} of {max}", optionsHint: "Need at least 2 distinct options, up to 10.", whenVotingCloses: "When does voting close?", howPeopleVote: "How do people vote?", votersSuggest: "Voters can suggest options", suggestionsDescription: "Let the crew add ideas", approveFirst: "Approve suggestions first", approvalDescription: "You approve each one before it joins", earlyResultsDescription: "Off = results only after you vote, no bandwagons", voteChangeDescription: "Voters can switch while the poll is open", expectedDescription: "Optional, shows turnout on the poll. Zero means unknown.",
   continueAsGuest: "Continue as a guest",
   creatorBackendMissing: "Creator features need the supplied database migrations. Ask the project administrator to review and apply them.", suggestionUnavailable: "This suggestion has already been reviewed or is no longer available. Results are being refreshed.",
   uncertainCreation: "Creation may have succeeded. Retry to recover the same poll before editing this draft.",
@@ -7,7 +8,7 @@ export const creatorEn = {
   question: "What are we deciding?", options: "Options", addOption: "Add an option", removeOption: "Remove option {n}", optionLabel: "Option {n}",
   settings: "Poll settings", allowSuggestions: "Allow suggestions", requireApproval: "Approve suggestions before adding them", showEarlyResults: "Show results before voting", allowVoteChange: "Allow vote changes",
   deadline: "Voting deadline", deadlineNone: "No deadline", deadlineHour: "1 hour", deadlineDay: "1 day", deadlineThreeDays: "3 days", deadlineWeek: "1 week", expectedVoters: "Expected voters (optional)",
-  questionRequired: "Enter a question.", optionsRequired: "Enter at least two distinct options, with at most ten fields.", expectedInvalid: "Enter a positive whole number up to 2,147,483,647.",
+  questionRequired: "Enter a question.", optionsRequired: "Enter at least two distinct options, with at most ten fields.", expectedInvalid: "Enter up to four digits. Zero means unknown.",
   creatorFailure: "The request failed. Check your connection and try again. If creator features are unavailable, the backend migration may be missing.",
   creating: "Creating…", draftHint: "Your draft is saved in this browser.", draftUnavailable: "This browser could not save your draft. Keep this page open until creation succeeds.",
   openFilter: "Open", closedFilter: "Closed", emptyOpen: "No open polls yet. Ask your crew a question to get started.", emptyClosed: "Your closed polls will appear here.",
@@ -20,6 +21,7 @@ export const creatorEn = {
   upgradeCheckEmail: "Check your email to verify this address, then return here to set your password. Keep this guest session.", upgradeFailed: "Could not save this guest account. Check that anonymous identity linking is enabled and try again.",
 };
 export const creatorEl: typeof creatorEn = {
+  newPoll: "Νέα ψηφοφορία", createGetLink: "Δημιουργία & λήψη συνδέσμου", questionPlaceholder: "Βραδιά πίτσας: τι παραγγέλνουμε;", filledOptions: "{n} από {max}", optionsHint: "Χρειάζονται τουλάχιστον 2 διαφορετικές επιλογές, έως 10.", whenVotingCloses: "Πότε κλείνει η ψηφοφορία;", howPeopleVote: "Πώς ψηφίζει η παρέα;", votersSuggest: "Οι ψηφοφόροι μπορούν να προτείνουν επιλογές", suggestionsDescription: "Άφησε την παρέα να προσθέσει ιδέες", approveFirst: "Έγκριση προτάσεων πρώτα", approvalDescription: "Εγκρίνεις κάθε πρόταση πριν προστεθεί", earlyResultsDescription: "Ανενεργό = αποτελέσματα μόνο αφού ψηφίσεις", voteChangeDescription: "Οι ψηφοφόροι μπορούν να αλλάξουν ψήφο όσο είναι ανοιχτή", expectedDescription: "Προαιρετικό, δείχνει συμμετοχή. Το μηδέν σημαίνει άγνωστο πλήθος.",
   continueAsGuest: "Συνέχεια ως επισκέπτης",
   creatorBackendMissing: "Οι λειτουργίες δημιουργού χρειάζονται τις παρεχόμενες ενημερώσεις βάσης. Ζήτησε από τον διαχειριστή να τις ελέγξει και να τις εφαρμόσει.", suggestionUnavailable: "Η πρόταση έχει ήδη ελεγχθεί ή δεν είναι διαθέσιμη. Τα αποτελέσματα ενημερώνονται.",
   uncertainCreation: "Η δημιουργία μπορεί να πέτυχε. Δοκίμασε ξανά για να ανακτήσεις την ίδια ψηφοφορία πριν αλλάξεις το πρόχειρο.",
@@ -28,7 +30,7 @@ export const creatorEl: typeof creatorEn = {
   question: "Τι αποφασίζουμε;", options: "Επιλογές", addOption: "Προσθήκη επιλογής", removeOption: "Αφαίρεση επιλογής {n}", optionLabel: "Επιλογή {n}",
   settings: "Ρυθμίσεις ψηφοφορίας", allowSuggestions: "Να επιτρέπονται προτάσεις", requireApproval: "Έγκριση προτάσεων πριν προστεθούν", showEarlyResults: "Εμφάνιση αποτελεσμάτων πριν την ψήφο", allowVoteChange: "Να επιτρέπεται αλλαγή ψήφου",
   deadline: "Προθεσμία ψηφοφορίας", deadlineNone: "Χωρίς προθεσμία", deadlineHour: "1 ώρα", deadlineDay: "1 ημέρα", deadlineThreeDays: "3 ημέρες", deadlineWeek: "1 εβδομάδα", expectedVoters: "Αναμενόμενοι ψηφοφόροι (προαιρετικό)",
-  questionRequired: "Γράψε μια ερώτηση.", optionsRequired: "Γράψε τουλάχιστον δύο διαφορετικές επιλογές, σε έως δέκα πεδία.", expectedInvalid: "Γράψε θετικό ακέραιο έως 2.147.483.647.",
+  questionRequired: "Γράψε μια ερώτηση.", optionsRequired: "Γράψε τουλάχιστον δύο διαφορετικές επιλογές, σε έως δέκα πεδία.", expectedInvalid: "Γράψε έως τέσσερα ψηφία. Το μηδέν σημαίνει άγνωστο πλήθος.",
   creatorFailure: "Το αίτημα απέτυχε. Έλεγξε τη σύνδεση και δοκίμασε ξανά. Ίσως λείπει η ενημέρωση της βάσης για τις λειτουργίες δημιουργού.",
   creating: "Δημιουργία…", draftHint: "Το πρόχειρο αποθηκεύεται σε αυτόν τον browser.", draftUnavailable: "Δεν ήταν δυνατή η αποθήκευση του πρόχειρου. Κράτησε τη σελίδα ανοιχτή μέχρι να δημιουργηθεί η ψηφοφορία.",
   openFilter: "Ανοιχτές", closedFilter: "Κλειστές", emptyOpen: "Δεν έχεις ανοιχτές ψηφοφορίες. Ξεκίνα με μια ερώτηση στην παρέα.", emptyClosed: "Οι κλειστές ψηφοφορίες σου θα εμφανίζονται εδώ.",

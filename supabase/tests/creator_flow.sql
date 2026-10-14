@@ -25,6 +25,7 @@ begin
   assert p = retry, 'Creation retry duplicated a poll';
   assert (select creator_id = auth.uid() and question = 'Dinner?' from public.polls where id = p), 'Ownership/normalization failed';
   assert (select count(*) = 2 from public.poll_options where poll_id = p), 'Option deduplication failed';
+  assert (select count(*) = 1 from public.notifications where poll_id = p and type = 'POLL_CREATED' and user_id = auth.uid()), 'Creation notification missing or duplicated';
   insert into creator_test_ids values ('poll', p);
   insert into creator_test_ids select 'pizza', id from public.poll_options where poll_id = p and text = 'Pizza';
   insert into creator_test_ids select 'soup', id from public.poll_options where poll_id = p and text = 'Soup';
