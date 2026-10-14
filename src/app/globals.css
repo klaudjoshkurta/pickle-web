@@ -1,23 +1,31 @@
 @import "tailwindcss";
 
 @theme {
+  /* Pickle palette: warm cream paper, dark-brown ink outlines, tomato + mustard accents, deep teal actions. */
   --color-cream: #faf2e3;
+  --color-paper: #fffbf4;
   --color-surface: #ffffff;
   --color-surface-variant: #efe2c8;
-  --color-surface-variant-hover: #e6d6b6;
+  --color-surface-variant-hover: #e6d5b4;
   --color-track: #efe2c8;
+  --color-ink: #3a2417;
+  --color-ink-muted: #6b5546;
   --color-primary: #007564;
-  --color-primary-hover: #00604f;
-  --color-primary-container: #e3f2ee;
+  --color-primary-hover: #005e50;
+  --color-primary-soft: #cfe7e1;
   --color-on-primary: #ffffff;
-  --color-ink: #222222;
-  --color-ink-muted: #5c5547;
+  --color-tomato: #e0532b;
+  --color-tomato-deep: #b63c1a;
+  --color-tomato-dim: #c4441f;
+  --color-mustard: #f3c24f;
   --color-danger: #b3261e;
 
   --font-sans: var(--font-google-sans), var(--font-inter), "Inter", system-ui, sans-serif;
+  /* Fredoka has no Greek glyphs; the browser falls back per glyph to M PLUS Rounded. */
+  --font-display: var(--font-fredoka), var(--font-rounded), var(--font-google-sans), system-ui, sans-serif;
 
-  --shadow-soft: 0 1px 2px rgb(34 34 34 / 0.06), 0 4px 16px rgb(34 34 34 / 0.06);
-  --shadow-soft-lg: 0 2px 6px rgb(34 34 34 / 0.08), 0 12px 32px rgb(34 34 34 / 0.12);
+  --radius-card: 1.25rem;
+  --shadow-pop: 3px 3px 0 var(--color-mustard);
 }
 
 body {
@@ -27,15 +35,31 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
+@utility font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+}
+
+/* Chunky headline with the mustard offset shadow from the design. */
+@utility headline-pop {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  text-shadow: 3px 3px 0 var(--color-mustard);
+}
+
 @layer components {
   .card {
-    @apply rounded-3xl bg-surface p-5 shadow-soft sm:p-6;
+    @apply rounded-card border-2 border-ink bg-paper;
   }
   .field {
-    @apply block min-h-12 w-full rounded-2xl border-2 border-surface-variant bg-surface px-4 text-base text-ink placeholder:text-ink-muted/70 focus:border-primary focus:outline-none aria-invalid:border-danger;
+    @apply block min-h-12 w-full rounded-full border-2 border-ink bg-surface px-5 text-base text-ink placeholder:text-ink-muted/70 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-paper aria-invalid:border-danger;
   }
   .link {
-    @apply rounded font-medium text-primary underline underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary;
+    @apply rounded font-semibold text-primary underline underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary;
+  }
+  .pill {
+    @apply inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold;
   }
 }
 
@@ -44,6 +68,15 @@ body {
   transform-origin: left center;
   transition: width 500ms cubic-bezier(0.2, 0, 0, 1);
   animation: bar-grow 700ms cubic-bezier(0.2, 0, 0, 1) both;
+}
+
+.segment-on {
+  animation: segment-in 400ms cubic-bezier(0.2, 0, 0, 1) both;
+  animation-delay: calc(var(--i, 0) * 45ms);
+}
+
+.live-dot {
+  animation: live-pulse 1.8s ease-out infinite;
 }
 
 @keyframes bar-grow {
@@ -55,8 +88,31 @@ body {
   }
 }
 
+@keyframes segment-in {
+  from {
+    transform: scaleY(0.2);
+    opacity: 0;
+  }
+  to {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+@keyframes live-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgb(0 117 100 / 0.45);
+  }
+  80%,
+  100% {
+    box-shadow: 0 0 0 7px rgb(0 117 100 / 0);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .result-bar {
+  .result-bar,
+  .segment-on,
+  .live-dot {
     animation: none;
     transition: none;
   }

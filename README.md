@@ -67,6 +67,14 @@ No `_redirects` or `vercel.json` rewrite is needed on either platform.
 - **Visibility rules** ([src/lib/pollLogic.ts](src/lib/pollLogic.ts)): approved options for everyone, plus the voter's own pending suggestions. Results are hidden until the voter votes unless `show_results_before_voting` is set or the poll is closed.
 - **Strings**: all copy is in [src/lib/i18n/translations.ts](src/lib/i18n/translations.ts).
 
+## Design
+
+- **Palette:** cream paper (`#FAF2E3`), dark-brown ink outlines (`#3A2417`), tomato (`#E0532B`), mustard (`#F3C24F`), and deep teal (`#007564`) for actions and bars. The tokens live in `@theme` in [src/app/globals.css](src/app/globals.css).
+- **Type:** chunky Fredoka headings with a mustard offset shadow (the `headline-pop` utility). Greek headings fall back to M PLUS Rounded 1c, and body text is Google Sans.
+- **Results layout:** the top option gets a tomato "In the lead" / "Winner" card with per-vote segments. The others sit in an outlined list with teal bars. The landing page reuses these same components with demo data.
+- **Contrast:** white text on tomato is used only for large or bold text. Smaller labels sit on the deeper tomato pill so they meet WCAG AA.
+- **Motion:** bars and segments animate in, and the live dot pulses. All of it turns off under `prefers-reduced-motion`.
+
 ## Placeholders to replace
 
 - `PLAY_STORE_URL` in [src/lib/config.ts](src/lib/config.ts) (Play Store listing).

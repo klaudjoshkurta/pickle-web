@@ -1,15 +1,15 @@
 export function PollSkeleton({ label = "Loading poll…" }: { label?: string }) {
   return (
-    <div role="status" aria-busy="true" className="card animate-pulse motion-reduce:animate-none">
+    <div role="status" aria-busy="true" className="animate-pulse motion-reduce:animate-none">
       <span className="sr-only">{label}</span>
-      <div className="h-7 w-4/5 rounded-full bg-surface-variant" />
-      <div className="mt-2 h-7 w-1/2 rounded-full bg-surface-variant" />
-      <div className="mt-6 flex flex-col gap-3">
-        {[0, 1, 2].map((i) => (
-          <div key={i} className="h-14 rounded-2xl bg-surface-variant" />
-        ))}
+      <div className="flex gap-2">
+        <div className="h-9 w-32 rounded-full bg-surface-variant" />
+        <div className="h-9 w-40 rounded-full bg-surface-variant" />
       </div>
-      <div className="mt-6 h-12 rounded-full bg-surface-variant" />
+      <div className="mt-6 h-10 w-11/12 rounded-full bg-surface-variant" />
+      <div className="mt-3 h-10 w-2/3 rounded-full bg-surface-variant" />
+      <div className="mt-8 h-52 rounded-card bg-surface-variant" />
+      <div className="mt-6 h-44 rounded-card bg-surface-variant" />
     </div>
   );
 }

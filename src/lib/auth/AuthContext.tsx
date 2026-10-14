@@ -18,8 +18,12 @@ interface AuthValue {
   error: Error | null;
   profile: Profile;
   retry: () => void;
+  /** Ensures a session exists, signing in anonymously if needed. */
+  ensureSession: () => void;
   /** Resolves true once the user has a display name, opening the profile dialog if needed. */
   requireProfile: () => Promise<boolean>;
+  /** Opens the profile dialog to edit name/avatar. */
+  openProfile: () => void;
 }
 
 const AuthContext = createContext<AuthValue | null>(null);
@@ -38,6 +42,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [ready, setReady] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [attempt, setAttempt] = useState(0);
+  // Anonymous sign-in only happens once a page asks for a session (poll pages), so
+  // landing-page visitors don't create throwaway users.
+  const [wanted, setWanted] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const pending = useRef<((ok: boolean) => void) | null>(null);
 
@@ -52,6 +59,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setReady(true);
         return;
       }
+      if (!wanted) return;
       const res = await supabase.auth.signInAnonymously();
       if (cancelled) return;
       if (res.error) {
@@ -64,7 +72,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, [attempt]);
+  }, [attempt, wanted]);
 
   useEffect(() => {
     const { data } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -87,6 +95,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
   }, [profile.displayName]);
 
+  const openProfile = useCallback(() => {
+    pending.current?.(false);
+    pending.current = null;
+    setDialogOpen(true);
+  }, []);
+
   const closeDialog = useCallback((ok: boolean) => {
     setDialogOpen(false);
     pending.current?.(ok);
@@ -100,9 +114,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       error,
       profile,
       retry: () => setAttempt((a) => a + 1),
+      ensureSession: () => setWanted(true),
       requireProfile,
+      openProfile,
     }),
-    [user, ready, error, profile, requireProfile],
+    [user, ready, error, profile, requireProfile, openProfile],
   );
 
   return (

@@ -1,11 +1,12 @@
 import { describe, expect, it } from "vitest";
 import {
   canShowResults,
-  closedOutcome,
   isDuplicateOption,
   isUuid,
   mapVoteError,
   percentOf,
+  segments,
+  standing,
   totalVotes,
   visibleOptions,
 } from "./pollLogic";
@@ -75,16 +76,6 @@ describe("isDuplicateOption", () => {
   });
 });
 
-describe("closedOutcome", () => {
-  it("reports winner, tie, or nothing", () => {
-    const options = [opt({ vote_count: 1 }), opt({ vote_count: 1 })];
-    expect(closedOutcome(poll(), options)).toEqual({ kind: "none" });
-    expect(closedOutcome(poll({ status: "CLOSED", winner_option_id: "x" }), options)).toEqual({ kind: "winner", optionId: "x" });
-    expect(closedOutcome(poll({ status: "CLOSED" }), options)).toEqual({ kind: "tie" });
-    expect(closedOutcome(poll({ status: "CLOSED" }), [opt()])).toEqual({ kind: "none" });
-  });
-});
-
 describe("mapVoteError", () => {
   it("maps RPC exceptions to friendly keys", () => {
     expect(mapVoteError("Poll is not open")).toBe("errPollClosed");
@@ -99,5 +90,31 @@ describe("isUuid", () => {
   it("validates ids", () => {
     expect(isUuid("00000000-0000-0000-0000-000000000001")).toBe(true);
     expect(isUuid("not-a-uuid")).toBe(false);
+  });
+});
+
+describe("standing", () => {
+  it("finds a unique leader and margin", () => {
+    const a = opt({ vote_count: 5 }), b = opt({ vote_count: 3 }), c = opt({ vote_count: 0 });
+    expect(standing(poll(), [a, b, c])).toEqual({ kind: "leader", option: a, margin: 2, final: false });
+  });
+  it("detects ties and empty polls", () => {
+    const a = opt({ vote_count: 2 }), b = opt({ vote_count: 2 });
+    expect(standing(poll(), [a, b])).toEqual({ kind: "tie", options: [a, b], final: false });
+    expect(standing(poll(), [opt(), opt()])).toEqual({ kind: "empty" });
+  });
+  it("prefers the declared winner on closed polls", () => {
+    const a = opt({ vote_count: 2 }), b = opt({ vote_count: 2 });
+    expect(standing(poll({ status: "CLOSED", winner_option_id: b.id }), [a, b])).toEqual({
+      kind: "leader", option: b, margin: 0, final: true,
+    });
+  });
+});
+
+describe("segments", () => {
+  it("uses one segment per vote up to the cap", () => {
+    expect(segments(5, 11)).toEqual({ filled: 5, size: 11 });
+    expect(segments(50, 100)).toEqual({ filled: 10, size: 20 });
+    expect(segments(0, 0)).toEqual({ filled: 0, size: 10 });
   });
 });

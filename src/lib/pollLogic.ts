@@ -34,14 +34,6 @@ export function isDuplicateOption(text: string, options: PollOption[]): boolean 
   return options.some((o) => normalizeOptionText(o.text).toLocaleLowerCase() === needle);
 }
 
-export type Outcome = { kind: "winner"; optionId: string } | { kind: "tie" } | { kind: "none" };
-
-export function closedOutcome(poll: Poll, options: PollOption[]): Outcome {
-  if (poll.status !== "CLOSED") return { kind: "none" };
-  if (poll.winner_option_id) return { kind: "winner", optionId: poll.winner_option_id };
-  return totalVotes(options) > 0 ? { kind: "tie" } : { kind: "none" };
-}
-
 export type VoteErrorKey = "errPollClosed" | "errOptionUnavailable" | "errVoteLocked" | "errGeneric";
 
 export function mapVoteError(message: string | undefined | null): VoteErrorKey {
@@ -50,4 +42,34 @@ export function mapVoteError(message: string | undefined | null): VoteErrorKey {
   if (m.includes("Option not found or not approved")) return "errOptionUnavailable";
   if (m.includes("Vote change not allowed")) return "errVoteLocked";
   return "errGeneric";
+}
+
+export type Standing =
+  | { kind: "empty" }
+  /** One option has strictly the most votes (or was declared winner). */
+  | { kind: "leader"; option: PollOption; margin: number; final: boolean }
+  | { kind: "tie"; options: PollOption[]; final: boolean };
+
+/** Who is on top: the declared winner for closed polls, otherwise the vote leader. */
+export function standing(poll: Poll, approved: PollOption[]): Standing {
+  const total = totalVotes(approved);
+  const final = poll.status === "CLOSED";
+  const sorted = [...approved].sort((a, b) => b.vote_count - a.vote_count);
+  const winner = poll.winner_option_id ? approved.find((o) => o.id === poll.winner_option_id) : undefined;
+  if (final && winner) {
+    const runnerUp = sorted.find((o) => o.id !== winner.id)?.vote_count ?? 0;
+    return { kind: "leader", option: winner, margin: winner.vote_count - runnerUp, final };
+  }
+  if (total === 0 || sorted.length === 0) return { kind: "empty" };
+  const top = sorted[0].vote_count;
+  const tied = sorted.filter((o) => o.vote_count === top);
+  if (tied.length > 1) return { kind: "tie", options: tied, final };
+  return { kind: "leader", option: sorted[0], margin: top - (sorted[1]?.vote_count ?? 0), final };
+}
+
+/** Segmented bar: one segment per vote, capped at 20 segments (then 5% each). */
+export function segments(count: number, total: number, max = 20): { filled: number; size: number } {
+  if (total <= 0) return { filled: 0, size: 10 };
+  if (total <= max) return { filled: count, size: total };
+  return { filled: Math.round((count / total) * max), size: max };
 }
