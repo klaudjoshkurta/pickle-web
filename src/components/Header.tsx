@@ -29,7 +29,7 @@ export function Header({ landing = false }: { landing?: boolean }) {
               aria-pressed={locale === l}
               onClick={() => setLocale(l)}
               className={`min-h-9 min-w-11 rounded-full px-3 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
-                locale === l ? "bg-paper text-ink shadow-[0_0_0_2px_var(--color-ink)]" : "text-ink-muted hover:text-ink"
+                locale === l ? `bg-paper text-ink ${landing ? "" : "shadow-[0_0_0_2px_var(--color-ink)]"}` : "text-ink-muted hover:text-ink"
               }`}
             >
               {l.toUpperCase()}
@@ -38,7 +38,7 @@ export function Header({ landing = false }: { landing?: boolean }) {
         </div>
 
         {landing && (
-          <a href={PLAY_STORE_URL} target="_blank" rel="noopener noreferrer" className={buttonClass("outline", "min-h-11 px-5 text-sm max-sm:hidden")}>
+          <a href={PLAY_STORE_URL} target="_blank" rel="noopener noreferrer" className={buttonClass("text", "min-h-11 px-5 text-sm max-sm:hidden")}>
             {t("getTheApp")}
           </a>
         )}

@@ -35,7 +35,7 @@ export function Landing() {
 function Hero() {
   const { t } = useI18n();
   return (
-    <section className="mx-auto grid w-full max-w-6xl items-center gap-12 px-4 pt-6 pb-16 sm:px-6 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:pt-12 lg:pb-24">
+    <section className="mx-auto grid w-full max-w-6xl items-center gap-14 px-4 pt-10 pb-20 sm:px-6 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:pt-16 lg:pb-28">
       <div>
         <span className="pill bg-primary-soft text-primary-hover">
           <span aria-hidden className="h-2 w-2 rounded-full bg-primary" />
@@ -47,7 +47,7 @@ function Hero() {
           <a href={PLAY_STORE_URL} target="_blank" rel="noopener noreferrer" className={buttonClass("dark", "min-h-14 px-7 text-lg")}>
             <PlayIcon size={20} /> {t("ctaAndroid")}
           </a>
-          <a href="#how" className={buttonClass("outline", "min-h-14 px-7 text-lg")}>
+          <a href="#how" className={buttonClass("text", "min-h-14 px-7 text-lg")}>
             {t("ctaHow")}
           </a>
         </div>
@@ -89,13 +89,14 @@ function DemoPoll() {
           percent={percentOf(DEMO_VOTES[0], DEMO_TOTAL)}
           margin={DEMO_VOTES[0] - DEMO_VOTES[1]}
           ribbon="lead"
+          appearance="soft"
         />
       </div>
       <div className="relative mt-4 rotate-[0.6deg]">
-        <ResultRows rows={rows} />
+        <ResultRows rows={rows} appearance="soft" />
       </div>
       <div className="mt-4 flex justify-end">
-        <span className="rounded-full border-2 border-ink bg-paper px-4 py-2">
+        <span className="px-2 py-1">
           <LiveIndicator />
         </span>
       </div>
@@ -108,7 +109,7 @@ function AvatarStack() {
     <span className="flex shrink-0 -space-x-3">
       {CREW.map((name) => (
         // eslint-disable-next-line @next/next/no-img-element -- remote SVG avatars
-        <img key={name} src={dicebearUrl(name)} alt="" width={40} height={40} className="h-10 w-10 rounded-full border-2 border-ink bg-surface-variant" />
+        <img key={name} src={dicebearUrl(name)} alt="" width={40} height={40} className="h-10 w-10 rounded-full border-2 border-cream bg-surface-variant" />
       ))}
     </span>
   );
@@ -122,19 +123,19 @@ function HowItWorks() {
     ["step3Title", "step3Body", "bg-tomato text-white"],
   ];
   return (
-    <section id="how" aria-labelledby="how-title" className="scroll-mt-6 border-y-2 border-ink bg-paper">
+    <section id="how" aria-labelledby="how-title" className="scroll-mt-6 bg-paper">
       <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:py-20">
         <h2 id="how-title" className="headline-pop text-4xl sm:text-5xl">
           {t("howTitle")}
         </h2>
-        <ol className="mt-10 grid gap-5 md:grid-cols-3">
+        <ol className="mt-12 grid gap-10 md:grid-cols-3 md:gap-12">
           {steps.map(([title, body, tone], i) => (
-            <li key={title} className="card bg-cream p-6">
-              <span className={`flex h-12 w-12 items-center justify-center rounded-full border-2 border-ink font-display text-2xl font-bold ${tone}`}>
+            <li key={title} className="max-w-sm">
+              <span className={`flex h-12 w-12 items-center justify-center rounded-full font-display text-2xl font-bold ${tone}`}>
                 {i + 1}
               </span>
               <h3 className="mt-4 font-display text-xl font-bold">{t(title)}</h3>
-              <p className="mt-2 text-ink-muted">{t(body)}</p>
+              <p className="mt-3 leading-relaxed text-ink-muted">{t(body)}</p>
             </li>
           ))}
         </ol>
@@ -156,15 +157,15 @@ function Features() {
       <h2 id="features-title" className="headline-pop text-4xl sm:text-5xl">
         {t("featuresTitle")}
       </h2>
-      <ul className="mt-10 grid gap-5 sm:grid-cols-2">
+      <ul className="mt-12 grid gap-x-16 gap-y-10 sm:grid-cols-2">
         {features.map(([title, body, icon, tone]) => (
-          <li key={title} className="card flex gap-4 p-6">
-            <span aria-hidden className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border-2 border-ink ${tone}`}>
+          <li key={title} className="flex gap-4">
+            <span aria-hidden className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl ${tone}`}>
               {icon}
             </span>
             <div>
               <h3 className="font-display text-xl font-bold">{t(title)}</h3>
-              <p className="mt-1 text-ink-muted">{t(body)}</p>
+              <p className="mt-2 max-w-md leading-relaxed text-ink-muted">{t(body)}</p>
             </div>
           </li>
         ))}
@@ -177,21 +178,19 @@ function ClosingCta() {
   const { t } = useI18n();
   return (
     <section className="mx-auto w-full max-w-6xl px-4 pb-16 sm:px-6">
-      <div className="relative overflow-hidden rounded-4xl border-2 border-ink bg-tomato px-6 py-12 text-center text-white sm:px-12 sm:py-16">
+      <div className="relative overflow-hidden rounded-4xl bg-tomato px-6 py-12 text-center text-white sm:px-12 sm:py-16">
         <span
           aria-hidden
-          className="absolute top-8 -right-16 hidden w-64 rotate-38 sm:block border-y-2 border-ink bg-mustard py-2 font-display text-sm font-bold tracking-wider text-ink uppercase"
+          className="absolute top-8 -right-16 hidden w-64 rotate-38 sm:block bg-mustard py-2 font-display text-sm font-bold tracking-wider text-ink uppercase"
         >
           {t("winner")}
         </span>
-        <h2 className="font-display text-4xl leading-tight font-bold [text-shadow:3px_3px_0_var(--color-ink)] sm:text-5xl">{t("ctaBandTitle")}</h2>
-        <p className="mx-auto mt-3 max-w-md text-xl font-bold">{t("ctaBandBody")}</p>
+        <h2 className="font-display text-4xl leading-tight font-bold sm:text-5xl">{t("ctaBandTitle")}</h2>
+        <p className="mx-auto mt-4 max-w-md text-lg leading-relaxed">{t("ctaBandBody")}</p>
         <a href={PLAY_STORE_URL} target="_blank" rel="noopener noreferrer" className={buttonClass("dark", "mt-8 min-h-14 px-8 text-lg")}>
           <PlayIcon size={20} /> {t("ctaAndroid")}
         </a>
-        <p className="mt-6">
-          <span className="pill bg-tomato-deep text-white">{t("landingHint")}</span>
-        </p>
+        <p className="mt-6 text-sm">{t("landingHint")}</p>
       </div>
     </section>
   );
@@ -200,7 +199,7 @@ function ClosingCta() {
 function SiteFooter() {
   const { t } = useI18n();
   return (
-    <footer className="mx-auto mt-auto flex w-full max-w-6xl flex-col items-center justify-between gap-3 border-t-2 border-dashed border-surface-variant px-4 py-8 text-sm text-ink-muted sm:flex-row sm:px-6">
+    <footer className="mx-auto mt-auto flex w-full max-w-6xl flex-col items-center justify-between gap-3 px-4 py-8 text-sm text-ink-muted sm:flex-row sm:px-6">
       <Wordmark />
       <p>{t("footerMadeWith")}</p>
     </footer>

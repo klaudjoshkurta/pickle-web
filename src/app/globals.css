@@ -20,9 +20,8 @@
   --color-mustard: #f3c24f;
   --color-danger: #b3261e;
 
-  --font-sans: var(--font-google-sans), var(--font-inter), "Inter", system-ui, sans-serif;
-  /* Fredoka has no Greek glyphs; the browser falls back per glyph to M PLUS Rounded. */
-  --font-display: var(--font-fredoka), var(--font-rounded), var(--font-google-sans), system-ui, sans-serif;
+  --font-sans: var(--font-google-sans), system-ui, sans-serif;
+  --font-display: var(--font-google-sans), system-ui, sans-serif;
 
   --radius-card: 1.25rem;
   --shadow-pop: 3px 3px 0 var(--color-mustard);
@@ -40,12 +39,11 @@ body {
   letter-spacing: -0.01em;
 }
 
-/* Chunky headline with the mustard offset shadow from the design. */
+/* Bold headline typography. */
 @utility headline-pop {
   font-family: var(--font-display);
   font-weight: 700;
   letter-spacing: -0.015em;
-  text-shadow: 3px 3px 0 var(--color-mustard);
 }
 
 @layer components {
