@@ -1,36 +1,73 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Pickle web
 
-## Getting Started
+The voter-facing web app for **Pickle** group polls. Creators make polls in the Android app and share `https://pickle.app/p/{pollId}`. This app is what opens: voters can vote, see results and suggest options without installing anything.
 
-First, run the development server:
+- Next.js 16 (App Router) + React 19 + TypeScript + Tailwind CSS v4
+- Supabase JS v2, talking directly to the existing project (no custom backend)
+- English and Greek, auto-detected, with an EN/EL toggle
+
+## Routes
+
+| Path | What it shows |
+| --- | --- |
+| `/` | Landing page with a "Get the Android app" call to action |
+| `/p/:pollId` | The poll: vote, results, suggestions, share |
+
+## Setup
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+cp .env.example .env.local   # then fill in the anon/publishable key
+npm run dev                  # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+| Variable | Value |
+| --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | `https://wywzsnegtykcdqfkvtsj.supabase.co` |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | The project's publishable key (`sb_publishable_…`) or legacy anon key, from Supabase → Project Settings → API Keys |
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Both values are public by design. Row Level Security protects the data. Never put the `service_role` key here.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Other scripts: `npm run build`, `npm start`, `npm run lint` and `npm test` (unit tests for the poll logic).
 
-## Learn More
+## Supabase prerequisites
 
-To learn more about Next.js, take a look at the following resources:
+The schema already exists, and this app does not migrate anything. The project needs:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. **Anonymous sign-ins enabled** (Authentication → Sign In / Providers). Voters get a silent anonymous session on first visit, because every RLS policy requires `authenticated`.
+2. **Email provider enabled**, for the optional "Sign in with email".
+3. **Realtime publication** for live updates. Today the `supabase_realtime` publication has no tables, so the app falls back to polling every 10 seconds. To get instant updates, run once:
+   ```sql
+   alter publication supabase_realtime add table public.polls, public.poll_options;
+   ```
+   The app keeps polling until it receives its first realtime event, and starts polling again whenever the channel drops, so it works either way.
+4. Add the deployed domain to Authentication → URL Configuration (Site URL / Redirect URLs) if you use email confirmation links.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Deploy
 
-## Deploy on Vercel
+Next serves `/p/[pollId]` itself, so a refresh on a poll URL works without the SPA rewrite a static Vite build would need.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Vercel
+1. Import the repo. The Next.js framework preset is detected automatically.
+2. Add `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` under Settings → Environment Variables (Production and Preview).
+3. Deploy, then point `pickle.app` at the project under Settings → Domains.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Netlify
+1. Import the repo. Netlify detects Next.js and uses its Next.js runtime (build command `npm run build`; leave the publish directory to the runtime).
+2. Add the same two environment variables under Site configuration → Environment variables.
+3. Deploy and attach the `pickle.app` domain.
+
+No `_redirects` or `vercel.json` rewrite is needed on either platform.
+
+## How it works
+
+- **Auth** ([src/lib/auth/AuthContext.tsx](src/lib/auth/AuthContext.tsx)): restores the persisted session (localStorage) or calls `signInAnonymously()`. Before the first vote or suggestion it asks for a display name and a DiceBear avatar, stored with `updateUser({ data: { display_name, avatar_url } })`.
+- **Data** ([src/lib/pollApi.ts](src/lib/pollApi.ts)): loads the poll, its options (by `created_at`) and the user's own vote in parallel. Votes go through the `cast_vote` RPC, and its exceptions map to friendly messages.
+- **Live updates** ([src/lib/usePoll.ts](src/lib/usePoll.ts)): a Supabase Realtime channel on `polls` and `poll_options` for this poll, with 10s polling as a fallback and a refresh when the tab becomes visible again.
+- **Visibility rules** ([src/lib/pollLogic.ts](src/lib/pollLogic.ts)): approved options for everyone, plus the voter's own pending suggestions. Results are hidden until the voter votes unless `show_results_before_voting` is set or the poll is closed.
+- **Strings**: all copy is in [src/lib/i18n/translations.ts](src/lib/i18n/translations.ts).
+
+## Placeholders to replace
+
+- `PLAY_STORE_URL` in [src/lib/config.ts](src/lib/config.ts) (Play Store listing).
+- `SHARE_BASE` in the same file, if the public domain changes.

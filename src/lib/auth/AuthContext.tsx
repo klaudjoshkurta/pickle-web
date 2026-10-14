@@ -1,0 +1,120 @@
+"use client";
+
+import type { User } from "@supabase/supabase-js";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { ProfileDialog } from "@/components/auth/ProfileDialog";
+import { supabase } from "@/lib/supabase";
+
+export interface Profile {
+  displayName: string | null;
+  avatarUrl: string | null;
+}
+
+interface AuthValue {
+  user: User | null;
+  /** True once a session (anonymous or real) exists. */
+  ready: boolean;
+  /** Set when anonymous sign-in failed (e.g. offline). */
+  error: Error | null;
+  profile: Profile;
+  retry: () => void;
+  /** Resolves true once the user has a display name, opening the profile dialog if needed. */
+  requireProfile: () => Promise<boolean>;
+}
+
+const AuthContext = createContext<AuthValue | null>(null);
+
+function profileOf(user: User | null): Profile {
+  const meta = user?.user_metadata ?? {};
+  const name = typeof meta.display_name === "string" ? meta.display_name.trim() : "";
+  return {
+    displayName: name || null,
+    avatarUrl: typeof meta.avatar_url === "string" ? meta.avatar_url : null,
+  };
+}
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
+  const [ready, setReady] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+  const [attempt, setAttempt] = useState(0);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const pending = useRef<((ok: boolean) => void) | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setError(null);
+      const { data } = await supabase.auth.getSession();
+      if (cancelled) return;
+      if (data.session) {
+        setUser(data.session.user);
+        setReady(true);
+        return;
+      }
+      const res = await supabase.auth.signInAnonymously();
+      if (cancelled) return;
+      if (res.error) {
+        setError(res.error);
+        return;
+      }
+      setUser(res.data.user);
+      setReady(true);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [attempt]);
+
+  useEffect(() => {
+    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        setUser(session.user);
+        setReady(true);
+      }
+    });
+    return () => data.subscription.unsubscribe();
+  }, []);
+
+  const profile = useMemo(() => profileOf(user), [user]);
+
+  const requireProfile = useCallback(() => {
+    if (profile.displayName) return Promise.resolve(true);
+    pending.current?.(false);
+    setDialogOpen(true);
+    return new Promise<boolean>((resolve) => {
+      pending.current = resolve;
+    });
+  }, [profile.displayName]);
+
+  const closeDialog = useCallback((ok: boolean) => {
+    setDialogOpen(false);
+    pending.current?.(ok);
+    pending.current = null;
+  }, []);
+
+  const value = useMemo<AuthValue>(
+    () => ({
+      user,
+      ready,
+      error,
+      profile,
+      retry: () => setAttempt((a) => a + 1),
+      requireProfile,
+    }),
+    [user, ready, error, profile, requireProfile],
+  );
+
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+      <ProfileDialog open={dialogOpen} onDone={closeDialog} />
+    </AuthContext.Provider>
+  );
+}
+
+export function useAuth() {
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error("useAuth must be used inside AuthProvider");
+  return ctx;
+}
