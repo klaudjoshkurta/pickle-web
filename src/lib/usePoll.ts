@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { PollNotFoundError, fetchPollBundle } from "./pollApi";
-import { supabase } from "./supabase";
+import { getSupabase } from "./supabase";
 import type { PollBundle } from "./types";
 
 const POLL_INTERVAL_MS = 10_000;
@@ -64,6 +64,7 @@ export function usePoll(pollId: string, enabled: boolean, userId: string | null)
       debounce = setTimeout(() => void refetch(), 250);
     };
 
+    const supabase = getSupabase();
     const channel = supabase
       .channel(`poll:${pollId}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "poll_options", filter: `poll_id=eq.${pollId}` }, onChange)

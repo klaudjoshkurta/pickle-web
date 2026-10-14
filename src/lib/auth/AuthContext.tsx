@@ -3,7 +3,7 @@
 import type { User } from "@supabase/supabase-js";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { ProfileDialog } from "@/components/auth/ProfileDialog";
-import { supabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase";
 
 export interface Profile {
   displayName: string | null;
@@ -52,6 +52,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     let cancelled = false;
     (async () => {
       setError(null);
+      const supabase = getSupabase();
       const { data } = await supabase.auth.getSession();
       if (cancelled) return;
       if (data.session) {
@@ -68,13 +69,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       setUser(res.data.user);
       setReady(true);
-    })();
+    })().catch((err: Error) => {
+      // e.g. missing env vars; poll pages show this as the error state.
+      if (!cancelled) setError(err);
+    });
     return () => {
       cancelled = true;
     };
   }, [attempt, wanted]);
 
   useEffect(() => {
+    let supabase;
+    try {
+      supabase = getSupabase();
+    } catch {
+      return; // Reported by the session effect above.
+    }
     const { data } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session) {
         setUser(session.user);

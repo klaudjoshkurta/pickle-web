@@ -4,7 +4,7 @@ import { useId, useState } from "react";
 import { dicebearUrl, randomSeeds } from "@/lib/avatars";
 import { useI18n } from "@/lib/i18n/LocaleContext";
 import type { MessageKey } from "@/lib/i18n/translations";
-import { supabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase";
 import { Button } from "../ui/Button";
 
 export function EmailSignIn({
@@ -37,7 +37,7 @@ export function EmailSignIn({
     setMessage(null);
 
     if (mode === "signIn") {
-      const { data, error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+      const { data, error } = await getSupabase().auth.signInWithPassword({ email: email.trim(), password });
       setBusy(false);
       if (error) {
         setMessage({ key: error.code === "invalid_credentials" ? "authInvalid" : "authGeneric", tone: "error" });
@@ -47,7 +47,7 @@ export function EmailSignIn({
       return;
     }
 
-    const { data, error } = await supabase.auth.signUp({
+    const { data, error } = await getSupabase().auth.signUp({
       email: email.trim(),
       password,
       options: { data: { display_name: name.trim(), avatar_url: dicebearUrl(randomSeeds(1)[0]) } },

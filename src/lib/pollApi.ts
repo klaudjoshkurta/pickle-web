@@ -1,4 +1,4 @@
-import { supabase } from "./supabase";
+import { getSupabase } from "./supabase";
 import { isUuid } from "./pollLogic";
 import type { Poll, PollBundle, PollOption } from "./types";
 
@@ -13,9 +13,9 @@ export async function fetchPollBundle(pollId: string): Promise<PollBundle> {
   if (!isUuid(pollId)) throw new PollNotFoundError();
 
   const [pollRes, optionsRes, voteRes] = await Promise.all([
-    supabase.from("polls").select("*").eq("id", pollId).maybeSingle<Poll>(),
-    supabase.from("poll_options").select("*").eq("poll_id", pollId).order("created_at").returns<PollOption[]>(),
-    supabase.from("votes").select("option_id").eq("poll_id", pollId).maybeSingle<{ option_id: string }>(),
+    getSupabase().from("polls").select("*").eq("id", pollId).maybeSingle<Poll>(),
+    getSupabase().from("poll_options").select("*").eq("poll_id", pollId).order("created_at").returns<PollOption[]>(),
+    getSupabase().from("votes").select("option_id").eq("poll_id", pollId).maybeSingle<{ option_id: string }>(),
   ]);
 
   if (pollRes.error?.code === "22P02") throw new PollNotFoundError();
@@ -32,12 +32,12 @@ export async function fetchPollBundle(pollId: string): Promise<PollBundle> {
 }
 
 export async function castVote(pollId: string, optionId: string) {
-  const { error } = await supabase.rpc("cast_vote", { p_poll_id: pollId, p_option_id: optionId });
+  const { error } = await getSupabase().rpc("cast_vote", { p_poll_id: pollId, p_option_id: optionId });
   if (error) throw error;
 }
 
 export async function suggestOption(poll: Poll, text: string, userId: string) {
-  const { error } = await supabase.from("poll_options").insert({
+  const { error } = await getSupabase().from("poll_options").insert({
     poll_id: poll.id,
     text,
     suggested_by: userId,
