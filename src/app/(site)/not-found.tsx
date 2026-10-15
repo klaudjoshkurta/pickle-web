@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Header } from "@/components/Header";
+import { Header } from "@/features/marketing/components/Header";
 import { buttonClass } from "@/components/ui/Button";
 
 export default function NotFound() {

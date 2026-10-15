@@ -6,6 +6,9 @@ The web app for **Pickle** group polls. Create and manage polls at `/app` or in 
 - Supabase JS v2, talking directly to the existing project (no custom backend)
 - English and Greek, auto-detected, with an EN/EL toggle
 
+See [architecture and contribution boundaries](docs/architecture.md) for the source
+map, feature ownership, route layouts, and validation workflow.
+
 ## Routes
 
 | Path | What it shows |
@@ -79,11 +82,11 @@ No `_redirects` or `vercel.json` rewrite is needed on either platform.
 
 ## How it works
 
-- **Auth** ([src/lib/auth/AuthContext.tsx](src/lib/auth/AuthContext.tsx)): restores the persisted session (localStorage) or calls `signInAnonymously()`. Before the first vote or suggestion it asks for a display name and a DiceBear avatar, stored with `updateUser({ data: { display_name, avatar_url } })`.
-- **Data** ([src/lib/pollApi.ts](src/lib/pollApi.ts)): loads the poll, its ordered options, the user's complete ballot, and their legacy single vote in parallel. Votes go through the `cast_ballot` RPC, and its exceptions map to friendly messages.
-- **Live updates** ([src/lib/usePoll.ts](src/lib/usePoll.ts)): a Supabase Realtime channel on `polls` and `poll_options` for this poll, with 10s polling as a fallback and a refresh when the tab becomes visible again.
-- **Visibility rules** ([src/lib/pollLogic.ts](src/lib/pollLogic.ts)): approved options for everyone, plus the voter's own pending suggestions. Results are hidden until the voter votes unless `show_results_before_voting` is set or the poll is closed.
-- **Strings**: all copy is in [src/lib/i18n/translations.ts](src/lib/i18n/translations.ts).
+- **Auth** ([src/features/auth/AuthContext.tsx](src/features/auth/AuthContext.tsx)): restores the persisted session (localStorage) or calls `signInAnonymously()`. Before the first vote or suggestion it asks for a display name and a DiceBear avatar, stored with `updateUser({ data: { display_name, avatar_url } })`.
+- **Data** ([src/features/polls/pollApi.ts](src/features/polls/pollApi.ts)): loads the poll, its ordered options, the user's complete ballot, and their legacy single vote in parallel. Votes go through the `cast_ballot` RPC, and its exceptions map to friendly messages.
+- **Live updates** ([src/features/polls/usePoll.ts](src/features/polls/usePoll.ts)): a Supabase Realtime channel on `polls` and `poll_options` for this poll, with 10s polling as a fallback and a refresh when the tab becomes visible again.
+- **Visibility rules** ([src/domain/polls/pollLogic.ts](src/domain/polls/pollLogic.ts)): approved options for everyone, plus the voter's own pending suggestions. Results are hidden until the voter votes unless `show_results_before_voting` is set or the poll is closed.
+- **Strings**: shared copy is in [src/lib/i18n/translations.ts](src/lib/i18n/translations.ts); creator-specific copy lives in [src/features/creator/copy.ts](src/features/creator/copy.ts).
 
 ## Design
 

@@ -6,6 +6,8 @@ const nextConfig: NextConfig = {
   experimental: {
     agentFeedback: true,
     globalNotFound: true,
+    // Avoid the CSS loader child-process IPC failure on Windows.
+    ...(process.platform === "win32" ? { turbopackPluginRuntimeStrategy: "workerThreads" as const } : {}),
   },
   cacheComponents: true,
   partialPrefetching: true,

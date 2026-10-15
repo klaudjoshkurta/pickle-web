@@ -9,7 +9,7 @@ const pollId = '00000000-0000-0000-0000-000000000001';
 const userId = '00000000-0000-0000-0000-000000000002';
 const avatar = 'https://api.dicebear.com/9.x/notionists/svg?seed=fixture';
 const project = 'wywzsnegtykcdqfkvtsj';
-const screenshotDir = 'docs/screenshots';
+const screenshotDir = process.env.PICKLE_SCREENSHOT_DIR || 'docs/screenshots';
 const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48"><rect width="48" height="48" rx="24" fill="#cde7e0"/><text x="24" y="32" text-anchor="middle" font-size="24" fill="#33201b">K</text></svg>';
 
 async function fixture(browser, config = {}) {

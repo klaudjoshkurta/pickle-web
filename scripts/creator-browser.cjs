@@ -11,7 +11,7 @@ const pollId='20000000-0000-0000-0000-000000000001';
 const templateId='30000000-0000-0000-0000-000000000001';
 const avatar='https://api.dicebear.com/9.x/notionists/svg?seed=creator-fixture';
 const svg='<svg xmlns="http://www.w3.org/2000/svg" width="56" height="56"><rect width="56" height="56" rx="28" fill="#cde7e0"/><text x="28" y="37" text-anchor="middle" font-size="28">K</text></svg>';
-const dir='docs/screenshots';
+const dir=process.env.PICKLE_SCREENSHOT_DIR||'docs/screenshots';
 let active;
 async function fixture(browser,mode='account'){
   const context=await browser.newContext({viewport:{width:390,height:844},colorScheme:'light',reducedMotion:'reduce'});
