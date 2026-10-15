@@ -73,3 +73,7 @@ export function segments(count: number, total: number, max = 20): { filled: numb
   if (total <= max) return { filled: count, size: total };
   return { filled: Math.round((count / total) * max), size: max };
 }
+
+export function deadlinePassed(poll: { status: string; closed_at: string | null }, now = Date.now()) {
+  return poll.status === "OPEN" && poll.closed_at !== null && Date.parse(poll.closed_at) <= now;
+}

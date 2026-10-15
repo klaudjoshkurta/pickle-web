@@ -11,26 +11,28 @@ export interface ResultRowData {
   isMine?: boolean;
   suggestedByYou?: boolean;
   isWinner?: boolean;
+  isSuggested?: boolean;
 }
 
 /** Outlined card of options with dashed dividers, teal bars, percentage and vote count. */
-export function ResultRows({ rows, avatarUrl, appearance = "outlined" }: { rows: ResultRowData[]; avatarUrl?: string | null; appearance?: "outlined" | "soft" }) {
+export function ResultRows({ rows, avatarUrl, appearance = "outlined", barMaxCount }: { rows: ResultRowData[]; avatarUrl?: string | null; appearance?: "outlined" | "soft"; barMaxCount?: number }) {
   if (rows.length === 0) return null;
   return (
     <ul className={`@container divide-surface-variant overflow-hidden ${appearance === "soft" ? "rounded-card bg-paper divide-y" : "card divide-y-2 divide-dashed"}`}>
       {rows.map((row) => (
-        <ResultRow key={row.id} row={row} avatarUrl={avatarUrl} />
+        <ResultRow key={row.id} row={row} avatarUrl={avatarUrl} barMaxCount={barMaxCount} />
       ))}
     </ul>
   );
 }
 
-function ResultRow({ row, avatarUrl }: { row: ResultRowData; avatarUrl?: string | null }) {
+function ResultRow({ row, avatarUrl, barMaxCount }: { row: ResultRowData; avatarUrl?: string | null; barMaxCount?: number }) {
   const { t, tp } = useI18n();
   return (
-    <li className="grid min-h-16 grid-cols-[1fr_auto] items-center gap-x-4 gap-y-2 px-5 py-4 @lg:grid-cols-[1fr_12.5rem_6.5rem] @lg:px-7">
+    <li className="grid min-h-20 grid-cols-[1fr_auto] items-center gap-x-4 gap-y-3 px-5 py-5 @2xl:grid-cols-[minmax(0,1fr)_12.5rem_6.5rem] @2xl:px-7">
       <div className="min-w-0">
-        <p className="font-semibold wrap-break-word">{row.text}</p>
+        <p className="font-display text-lg font-semibold leading-snug wrap-break-word">{row.text}</p>
+        {row.isSuggested && !row.suggestedByYou && <p className="mt-1 text-sm text-ink-muted">{t("suggestedOption")}</p>}
         {(row.isMine || row.suggestedByYou) && (
           <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-ink-muted">
             {row.suggestedByYou && (
@@ -50,12 +52,12 @@ function ResultRow({ row, avatarUrl }: { row: ResultRowData; avatarUrl?: string 
           </p>
         )}
       </div>
-      <p className="text-right whitespace-nowrap @lg:order-last">
+      <p className="text-right whitespace-nowrap @2xl:order-last">
         <span className="font-display text-xl font-bold tabular-nums">{t("percent", { n: row.percent })}</span>{" "}
         <span className="text-sm text-ink-muted">{tp("votesCount", row.count)}</span>
       </p>
-      <span className="col-span-2 block h-3 overflow-hidden rounded-full bg-track @lg:col-span-1" aria-hidden>
-        <span className="result-bar block h-full rounded-full bg-primary" style={{ width: `${row.percent}%` }} />
+      <span className="col-span-2 block h-3 overflow-hidden rounded-full bg-track @2xl:col-span-1" aria-hidden>
+        <span className="result-bar block h-full rounded-full bg-primary" style={{ width: `${barMaxCount && barMaxCount > 0 ? Math.min(100, (row.count / barMaxCount) * 100) : row.percent}%` }} />
       </span>
     </li>
   );

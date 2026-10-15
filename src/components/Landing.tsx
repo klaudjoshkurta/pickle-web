@@ -1,13 +1,12 @@
 "use client";
+import { PLAY_STORE_URL } from "@/lib/config";
 
 import { dicebearUrl } from "@/lib/avatars";
-import { PLAY_STORE_URL } from "@/lib/config";
 import { useI18n } from "@/lib/i18n/LocaleContext";
 import type { MessageKey } from "@/lib/i18n/translations";
 import { percentOf } from "@/lib/pollLogic";
-import { BoltIcon, CheckIcon, PlayIcon, ScaleIcon, SparkIcon, UserIcon } from "./icons";
+import { BoltIcon, CheckIcon, ScaleIcon, SparkIcon, UserIcon } from "./icons";
 import { Header } from "./Header";
-import { Wordmark } from "./Logo";
 import { LeaderCard } from "./poll/LeaderCard";
 import { ResultRows } from "./poll/ResultRows";
 import { LiveIndicator } from "./poll/ResultsFooter";
@@ -26,7 +25,6 @@ export function Landing() {
         <HowItWorks />
         <Features />
         <ClosingCta />
-        <SiteFooter />
       </main>
     </>
   );
@@ -44,9 +42,7 @@ function Hero() {
         <h1 className="headline-pop mt-5 text-5xl leading-[1.02] sm:text-6xl lg:text-7xl">{t("heroTitle")}</h1>
         <p className="mt-5 max-w-xl text-lg text-ink-muted">{t("heroBody")}</p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <a href={PLAY_STORE_URL} target="_blank" rel="noopener noreferrer" className={buttonClass("dark", "min-h-14 px-7 text-lg")}>
-            <PlayIcon size={20} /> {t("ctaAndroid")}
-          </a>
+          <a href={PLAY_STORE_URL} className={buttonClass("primary", "min-h-14 px-7 text-lg")}>{t("ctaAndroid")}</a>
           <a href="#how" className={buttonClass("text", "min-h-14 px-7 text-lg")}>
             {t("ctaHow")}
           </a>
@@ -81,7 +77,7 @@ function DemoPoll() {
         <AvatarStack />
         <p className="font-display text-lg leading-tight font-bold">{t("demoQuestion")}</p>
       </div>
-      <div className="relative -rotate-1 transition-transform duration-500 hover:rotate-0 motion-reduce:transition-none">
+      <div className="relative">
         <LeaderCard
           text={t("demoOption1")}
           count={DEMO_VOTES[0]}
@@ -89,11 +85,10 @@ function DemoPoll() {
           percent={percentOf(DEMO_VOTES[0], DEMO_TOTAL)}
           margin={DEMO_VOTES[0] - DEMO_VOTES[1]}
           ribbon="lead"
-          appearance="soft"
         />
       </div>
-      <div className="relative mt-4 rotate-[0.6deg]">
-        <ResultRows rows={rows} appearance="soft" />
+      <div className="relative mt-5">
+        <ResultRows rows={rows} barMaxCount={DEMO_VOTES[0]} />
       </div>
       <div className="mt-4 flex justify-end">
         <span className="px-2 py-1">
@@ -187,21 +182,9 @@ function ClosingCta() {
         </span>
         <h2 className="font-display text-4xl leading-tight font-bold sm:text-5xl">{t("ctaBandTitle")}</h2>
         <p className="mx-auto mt-4 max-w-md text-lg leading-relaxed">{t("ctaBandBody")}</p>
-        <a href={PLAY_STORE_URL} target="_blank" rel="noopener noreferrer" className={buttonClass("dark", "mt-8 min-h-14 px-8 text-lg")}>
-          <PlayIcon size={20} /> {t("ctaAndroid")}
-        </a>
+        <a href={PLAY_STORE_URL} className={buttonClass("primary", "mt-8 min-h-14 px-8 text-lg")}>{t("ctaAndroid")}</a>
         <p className="mt-6 text-sm">{t("landingHint")}</p>
       </div>
     </section>
-  );
-}
-
-function SiteFooter() {
-  const { t } = useI18n();
-  return (
-    <footer className="mx-auto mt-auto flex w-full max-w-6xl flex-col items-center justify-between gap-3 px-4 py-8 text-sm text-ink-muted sm:flex-row sm:px-6">
-      <Wordmark />
-      <p>{t("footerMadeWith")}</p>
-    </footer>
   );
 }

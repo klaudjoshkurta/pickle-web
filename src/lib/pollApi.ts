@@ -1,5 +1,5 @@
 import { getSupabase } from "./supabase";
-import { isUuid } from "./pollLogic";
+import { deadlinePassed, isUuid } from "./pollLogic";
 import type { Poll, PollBundle, PollOption } from "./types";
 
 export class PollNotFoundError extends Error {
@@ -21,6 +21,17 @@ export async function fetchPollBundle(pollId: string): Promise<PollBundle> {
   if (pollRes.error?.code === "22P02") throw new PollNotFoundError();
   if (pollRes.error) throw pollRes.error;
   if (!pollRes.data) throw new PollNotFoundError();
+  if (deadlinePassed(pollRes.data)) {
+    const { error } = await getSupabase().rpc("expire_poll", { p_poll_id: pollId });
+    // Existing public voting continues to work before the additive migration is applied.
+    if (error && error.code !== "PGRST202") throw error;
+    if (!error) {
+      const fresh = await getSupabase().from("polls").select("*").eq("id", pollId).maybeSingle<Poll>();
+      if (fresh.error) throw fresh.error;
+      if (!fresh.data) throw new PollNotFoundError();
+      pollRes.data = fresh.data;
+    }
+  }
   if (optionsRes.error) throw optionsRes.error;
   if (voteRes.error) throw voteRes.error;
 

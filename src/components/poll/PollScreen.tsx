@@ -175,7 +175,7 @@ function PollView({ data, refetch }: { data: PollBundle; refetch: () => Promise<
             />
           )}
           {top.kind === "tie" && <TieCard names={top.options.map((o) => o.text)} count={top.options[0].vote_count} />}
-          <ResultRows rows={restRows} avatarUrl={profile.avatarUrl} />
+          <ResultRows rows={restRows} avatarUrl={profile.avatarUrl} barMaxCount={Math.max(0, ...approved.map((o) => o.vote_count))} />
           <ResultsFooter total={total} standing={top} live={isOpen} />
           <PendingList options={pending} />
           {isOpen && hasVoted &&

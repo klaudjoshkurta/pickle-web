@@ -47,20 +47,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [wanted, setWanted] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const pending = useRef<((ok: boolean) => void) | null>(null);
+  const sessionLost = useRef(false);
+  const ensureSession = useCallback(() => setWanted(true), []);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       setError(null);
       const supabase = getSupabase();
-      const { data } = await supabase.auth.getSession();
+      const { data, error: sessionError } = await supabase.auth.getSession();
       if (cancelled) return;
+      if (sessionError) throw sessionError;
       if (data.session) {
         setUser(data.session.user);
         setReady(true);
         return;
       }
       if (!wanted) return;
+      if (sessionLost.current) {
+        setError(new Error("Session lost. Sign in to recover your votes and suggestions."));
+        return;
+      }
       const res = await supabase.auth.signInAnonymously();
       if (cancelled) return;
       if (res.error) {
@@ -87,8 +94,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     const { data } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session) {
+        sessionLost.current = false;
         setUser(session.user);
         setReady(true);
+        setError(null);
+      } else if (_event !== "INITIAL_SESSION") {
+        sessionLost.current = true;
+        setUser(null);
+        setReady(false);
+        setError(new Error("Session expired. Sign in again."));
+        pending.current?.(false);
+        pending.current = null;
+        setDialogOpen(false);
       }
     });
     return () => data.subscription.unsubscribe();
@@ -124,11 +141,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       error,
       profile,
       retry: () => setAttempt((a) => a + 1),
-      ensureSession: () => setWanted(true),
+      ensureSession,
       requireProfile,
       openProfile,
     }),
-    [user, ready, error, profile, requireProfile, openProfile],
+    [user, ready, error, profile, requireProfile, openProfile, ensureSession],
   );
 
   return (
