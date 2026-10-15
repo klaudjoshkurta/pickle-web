@@ -3,7 +3,7 @@
 import { useI18n } from "@/lib/i18n/LocaleContext";
 import type { Standing } from "@/lib/pollLogic";
 
-export function ResultsFooter({ total, standing, live }: { total: number; standing: Standing; live: boolean }) {
+export function ResultsFooter({ total, selections, standing, live }: { total: number; selections?: number; standing: Standing; live: boolean }) {
   const { t, tp } = useI18n();
   const tagline =
     standing.kind === "empty"
@@ -21,7 +21,8 @@ export function ResultsFooter({ total, standing, live }: { total: number; standi
           t("noVotesYet")
         ) : (
           <>
-            {tp("votesIn", total)}
+            {tp(selections == null ? "votesIn" : "votersCount", total)}
+            {selections != null && <> · {tp("selectionsCount", selections)}</>}
             {tagline && <span className="text-tomato-deep"> · {tagline}</span>}
           </>
         )}

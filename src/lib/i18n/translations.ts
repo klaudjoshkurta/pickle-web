@@ -2,6 +2,11 @@ export type Locale = "en" | "el";
 export const LOCALES: Locale[] = ["en", "el"];
 
 const en = {
+  multipleChoice: "Multiple choice",
+  leaderVoters: "{x} of {n} voters",
+  selectOptions: "Select every option that works for you.",
+  votersCount: { one: "{n} voter", other: "{n} voters" },
+  selectionsCount: { one: "{n} selection", other: "{n} selections" },
   switchWarning: "Signing into an existing account switches identity. Guest votes and suggestions are not transferred.",
   finishAccount: "Finish saving your account",
   finishAccountHint: "After verifying your email, set a password to finish saving this account.",
@@ -193,6 +198,11 @@ export type PluralKey = {
 }[keyof Messages];
 
 const el: Messages = {
+  multipleChoice: "Πολλαπλές επιλογές",
+  leaderVoters: "{x} από {n} ψηφοφόρους",
+  selectOptions: "Επίλεξε όλες τις επιλογές που σε βολεύουν.",
+  votersCount: { one: "{n} ψηφοφόρος", other: "{n} ψηφοφόροι" },
+  selectionsCount: { one: "{n} επιλογή", other: "{n} επιλογές" },
   blogDescription: "Ιδέες, νέα και καλύτεροι τρόποι να κάνετε σχέδια μαζί.",
   blogEmpty: "Δεν υπάρχουν άρθρα ακόμα. Επιστρέψτε σύντομα για νέα από το Pickle.",
   blogReadArticle: "Διαβάστε το άρθρο",

@@ -9,6 +9,7 @@ interface LeaderCardProps {
   text: string;
   count: number;
   total: number;
+  multiple?: boolean;
   percent: number;
   margin: number;
   ribbon: "lead" | "winner";
@@ -18,7 +19,7 @@ interface LeaderCardProps {
 }
 
 /** The highlighted top option: tomato card, mustard corner ribbon, big percentage and per-vote segments. */
-export function LeaderCard({ text, count, total, percent, margin, ribbon, isMine, suggestedByYou, avatarUrl, appearance = "outlined" }: LeaderCardProps) {
+export function LeaderCard({ text, count, total, multiple = false, percent, margin, ribbon, isMine, suggestedByYou, avatarUrl, appearance = "outlined" }: LeaderCardProps) {
   const { t } = useI18n();
   const seg = segments(count, total);
 
@@ -56,7 +57,7 @@ export function LeaderCard({ text, count, total, percent, margin, ribbon, isMine
           <span className="align-top text-xl">%</span>
         </p>
         <p className="rounded-2xl bg-tomato-deep px-4 py-2 text-sm font-semibold text-white">
-          <span>{t("leaderVotes", { x: count, n: total })}</span>
+          <span>{t(multiple ? "leaderVoters" : "leaderVotes", { x: count, n: total })}</span>
           {margin > 0 && <span className="font-medium text-white/90">· {t("aheadBy", { n: margin })}</span>}
         </p>
       </div>

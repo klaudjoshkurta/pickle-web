@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { useI18n } from "@/lib/i18n/LocaleContext";
 import type { MessageKey } from "@/lib/i18n/translations";
-import { castVote, suggestOption } from "@/lib/pollApi";
+import { castBallot, suggestOption } from "@/lib/pollApi";
 import { canShowResults, mapVoteError, percentOf, standing, totalVotes, visibleOptions } from "@/lib/pollLogic";
 import type { PollBundle } from "@/lib/types";
 import { usePoll } from "@/lib/usePoll";
@@ -40,40 +40,48 @@ function PollView({ data, refetch }: { data: PollBundle; refetch: () => Promise<
   const { user, profile, requireProfile } = useAuth();
   const toast = useToast();
   const questionId = useId();
-  const { poll, options, myVoteOptionId } = data;
+  const { poll, options, myVoteOptionIds } = data;
   const userId = user?.id ?? null;
 
   // null = "follow my saved vote"; set when the user taps a different option.
-  const [picked, setPicked] = useState<string | null>(null);
+  const [picked, setPicked] = useState<string[] | null>(null);
   const [changing, setChanging] = useState(false);
   const [voting, setVoting] = useState(false);
 
   const isOpen = poll.status === "OPEN";
-  const hasVoted = myVoteOptionId != null;
+  const hasVoted = myVoteOptionIds.length > 0;
+  const multiple = poll.voting_mode === "MULTIPLE";
+  const submitting = useRef(false);
   const mode = isOpen && (!hasVoted || (changing && poll.allow_vote_change)) ? "vote" : "results";
 
   const visible = visibleOptions(options, userId);
   const approved = visible.filter((o) => o.status === "APPROVED");
   const pending = visible.filter((o) => o.status === "PENDING");
-  const selectedId = picked && approved.some((o) => o.id === picked) ? picked : myVoteOptionId;
+  const selectedIds = (picked ?? myVoteOptionIds).filter((id) => approved.some((o) => o.id === id));
+  const sameBallot = selectedIds.length === myVoteOptionIds.length && selectedIds.every((id) => myVoteOptionIds.includes(id));
+  function select(id: string) { setPicked(multiple ? selectedIds.includes(id) ? selectedIds.filter((value) => value !== id) : [...selectedIds,id] : [id]); }
   const showResults = canShowResults(poll, hasVoted);
-  const total = totalVotes(approved);
+  const selections = totalVotes(approved);
+  const total = poll.voter_count ?? selections;
   const top = standing(poll, approved);
 
   async function vote() {
-    if (!selectedId || voting) return;
-    if (!(await requireProfile())) return;
+    if (!selectedIds.length || submitting.current) return;
+    submitting.current = true;
     setVoting(true);
     try {
-      await castVote(poll.id, selectedId);
+      if (!(await requireProfile())) return;
+      await castBallot(poll.id, selectedIds);
       toast(t("voteThanks"));
       setChanging(false);
+      setPicked(null);
+      await refetch();
     } catch (err) {
       toast(t(mapVoteError((err as { message?: string })?.message)));
+    } finally {
+      submitting.current = false;
+      setVoting(false);
     }
-    await refetch();
-    setPicked(null);
-    setVoting(false);
   }
 
   async function suggest(text: string): Promise<MessageKey | null> {
@@ -93,7 +101,7 @@ function PollView({ data, refetch }: { data: PollBundle; refetch: () => Promise<
     text: o.text,
     count: o.vote_count,
     percent: percentOf(o.vote_count, total),
-    isMine: o.id === myVoteOptionId,
+    isMine: myVoteOptionIds.includes(o.id),
     suggestedByYou: userId != null && o.suggested_by === userId,
   });
   const byVotes = [...approved].sort((a, b) => b.vote_count - a.vote_count);
@@ -115,7 +123,7 @@ function PollView({ data, refetch }: { data: PollBundle; refetch: () => Promise<
                   ? tp("youAndOthers", total - 1)
                   : t("youVoted")
                 : total > 0
-                  ? tp("votesSoFar", total)
+                  ? tp(multiple ? "votersCount" : "votesSoFar", total)
                   : t("noVotesYet")
           }
           expected={showResults && poll.expected_voters ? t("votedOfExpected", { x: total, n: poll.expected_voters }) : null}
@@ -128,21 +136,22 @@ function PollView({ data, refetch }: { data: PollBundle; refetch: () => Promise<
           <VoteList
             labelledBy={questionId}
             options={approved}
-            selectedId={selectedId}
-            myVoteId={myVoteOptionId}
+            selectedIds={selectedIds}
+            multiple={multiple}
+            myVoteIds={myVoteOptionIds}
             disabled={voting}
             showResults={showResults}
             total={total}
             userId={userId}
-            onSelect={setPicked}
+            onSelect={select}
           />
           <PendingList options={pending} />
           <div className="flex flex-col gap-2 sm:flex-row-reverse sm:items-center">
             <Button
               className="w-full sm:w-auto sm:min-w-48"
               onClick={vote}
-              disabled={voting || !selectedId || selectedId === myVoteOptionId}
-              aria-describedby={!selectedId ? `${questionId}-hint` : undefined}
+              disabled={voting || !selectedIds.length || sameBallot}
+              aria-describedby={!selectedIds.length ? `${questionId}-hint` : undefined}
             >
               {voting ? t("voting") : hasVoted ? t("changeVote") : t("vote")}
             </Button>
@@ -151,9 +160,9 @@ function PollView({ data, refetch }: { data: PollBundle; refetch: () => Promise<
                 {t("keepVote")}
               </Button>
             ) : (
-              !selectedId && (
+              !selectedIds.length && (
                 <p id={`${questionId}-hint`} className="flex-1 text-sm text-ink-muted">
-                  {t("selectAnOption")}
+                  {t(multiple ? "selectOptions" : "selectAnOption")}
                 </p>
               )
             )}
@@ -166,17 +175,18 @@ function PollView({ data, refetch }: { data: PollBundle; refetch: () => Promise<
               text={top.option.text}
               count={top.option.vote_count}
               total={total}
+              multiple={multiple}
               percent={percentOf(top.option.vote_count, total)}
               margin={top.margin}
               ribbon={top.final ? "winner" : "lead"}
-              isMine={top.option.id === myVoteOptionId}
+              isMine={myVoteOptionIds.includes(top.option.id)}
               suggestedByYou={userId != null && top.option.suggested_by === userId}
               avatarUrl={profile.avatarUrl}
             />
           )}
           {top.kind === "tie" && <TieCard names={top.options.map((o) => o.text)} count={top.options[0].vote_count} />}
           <ResultRows rows={restRows} avatarUrl={profile.avatarUrl} barMaxCount={Math.max(0, ...approved.map((o) => o.vote_count))} />
-          <ResultsFooter total={total} standing={top} live={isOpen} />
+          <ResultsFooter total={total} selections={multiple ? selections : undefined} standing={top} live={isOpen} />
           <PendingList options={pending} />
           {isOpen && hasVoted &&
             (poll.allow_vote_change ? (

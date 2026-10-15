@@ -31,7 +31,7 @@ npm run dev                  # http://localhost:3000
 
 Both values are public by design. Row Level Security protects the data. Never put the `service_role` key here.
 
-Other scripts: `npm run build`, `npm start`, `npm run lint` and `npm test` (unit tests for the poll logic).
+Other scripts: `npm run build`, `npm start`, `npm run lint` and `npm test` (unit tests for poll logic, ballot APIs, and accessible voting controls).
 
 ## Blog editing
 
@@ -73,7 +73,7 @@ No `_redirects` or `vercel.json` rewrite is needed on either platform.
 ## How it works
 
 - **Auth** ([src/lib/auth/AuthContext.tsx](src/lib/auth/AuthContext.tsx)): restores the persisted session (localStorage) or calls `signInAnonymously()`. Before the first vote or suggestion it asks for a display name and a DiceBear avatar, stored with `updateUser({ data: { display_name, avatar_url } })`.
-- **Data** ([src/lib/pollApi.ts](src/lib/pollApi.ts)): loads the poll, its options (by `created_at`) and the user's own vote in parallel. Votes go through the `cast_vote` RPC, and its exceptions map to friendly messages.
+- **Data** ([src/lib/pollApi.ts](src/lib/pollApi.ts)): loads the poll, its options (by stable `position`, then `created_at`) and the user's complete saved ballot in parallel. Votes go through the `cast_ballot` RPC, and its exceptions map to friendly messages.
 - **Live updates** ([src/lib/usePoll.ts](src/lib/usePoll.ts)): a Supabase Realtime channel on `polls` and `poll_options` for this poll, with 10s polling as a fallback and a refresh when the tab becomes visible again.
 - **Visibility rules** ([src/lib/pollLogic.ts](src/lib/pollLogic.ts)): approved options for everyone, plus the voter's own pending suggestions. Results are hidden until the voter votes unless `show_results_before_voting` is set or the poll is closed.
 - **Strings**: all copy is in [src/lib/i18n/translations.ts](src/lib/i18n/translations.ts).

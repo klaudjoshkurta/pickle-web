@@ -16,6 +16,7 @@ export function StatusPills({ poll, showCreated = true }: { poll: Poll; showCrea
 
   return (
     <div className="flex flex-wrap items-center gap-2" role={open ? undefined : "status"}>
+      {poll.voting_mode === "MULTIPLE" && <span className="pill bg-surface-variant">{t("multipleChoice")}</span>}
       {open ? (
         <span className="pill bg-primary-soft text-primary-hover">
           <span aria-hidden className="h-2 w-2 rounded-full bg-primary" />
