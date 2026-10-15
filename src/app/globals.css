@@ -21,7 +21,7 @@
   --color-danger: #b3261e;
 
   --font-sans: var(--font-google-sans), system-ui, sans-serif;
-  --font-display: var(--font-fredoka), var(--font-google-sans), system-ui, sans-serif;
+  --font-display: var(--font-google-sans), system-ui, sans-serif;
 
   --radius-card: 1.5rem;
   --shadow-pop: 3px 3px 0 var(--color-mustard);
@@ -39,12 +39,11 @@ body {
   letter-spacing: -0.01em;
 }
 
-/* Rounded headings and the mustard offset shadow from the supplied reference. */
+/* Shared heading typography. */
 @utility headline-pop {
   font-family: var(--font-display);
   font-weight: 700;
   letter-spacing: -0.015em;
-  text-shadow: 2px 3px 0 var(--color-mustard);
 }
 
 @layer components {

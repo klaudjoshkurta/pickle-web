@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Fredoka, Google_Sans } from "next/font/google";
+import { Google_Sans } from "next/font/google";
 import { Providers } from "@/components/Providers";
 import { SiteFooter } from "@/components/SiteFooter";
 import "./globals.css";
@@ -9,7 +9,6 @@ const googleSans = Google_Sans({
   subsets: ["latin", "greek"],
   weight: ["400", "500", "600", "700"],
 });
-const fredoka = Fredoka({ variable: "--font-fredoka", subsets: ["latin"], weight: ["500", "600", "700"], display: "swap" });
 
 export const metadata: Metadata = {
   title: { default: "Pickle: group polls, settled", template: "%s · Pickle" },
@@ -22,7 +21,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${googleSans.variable} ${fredoka.variable} h-full antialiased`}>
+    <html lang="en" className={`${googleSans.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         <Providers>
           <div className="flex flex-1 flex-col">{children}<SiteFooter /></div>

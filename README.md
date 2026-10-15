@@ -71,7 +71,7 @@ No `_redirects` or `vercel.json` rewrite is needed on either platform.
 ## Design
 
 - **Palette:** cream paper (`#FAF2E3`), dark-brown ink outlines (`#3A2417`), tomato (`#E0532B`), mustard (`#F3C24F`), and deep teal (`#007564`) for actions and bars. The tokens live in `@theme` in [src/app/globals.css](src/app/globals.css).
-- **Type:** chunky Fredoka headings with a mustard offset shadow (the `headline-pop` utility). Greek headings fall back to M PLUS Rounded 1c, and body text is Google Sans.
+- **Type:** Google Sans for body text and headings in English and Greek. Headings use bold weight without text shadows.
 - **Results layout:** the top option gets a tomato "In the lead" / "Winner" card with per-vote segments. The others sit in an outlined list with teal bars. The landing page reuses these same components with demo data.
 - **Contrast:** white text on tomato is used only for large or bold text. Smaller labels sit on the deeper tomato pill so they meet WCAG AA.
 - **Motion:** bars and segments animate in, and the live dot pulses. All of it turns off under `prefers-reduced-motion`.
