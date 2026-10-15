@@ -18,6 +18,7 @@ import { ResultsFooter } from "./ResultsFooter";
 import { ShareBar } from "./ShareBar";
 import { StatusPills } from "./StatusPills";
 import { PendingList, SuggestCard } from "./SuggestCard";
+import { CreatorControls } from "../creator/CreatorControls";
 import { VoteList } from "./VoteList";
 
 export function PollScreen({ pollId }: { pollId: string }) {
@@ -41,7 +42,10 @@ function PollView({ data, refetch }: { data: PollBundle; refetch: () => Promise<
   const actionsRef = useRef<HTMLDivElement>(null);
   const active = useRef(true);
   useEffect(() => { active.current = true; return () => { active.current = false; }; }, []);
-  const { poll, options } = data;
+  const { poll: remotePoll, options } = data;
+  const [closedLocally, setClosedLocally] = useState(false);
+  const poll = closedLocally ? { ...remotePoll, status: "CLOSED" as const } : remotePoll;
+  const isOwner = user?.id === poll.creator_id && !user?.is_anonymous;
   const [picked, setPicked] = useState<string[] | null>(null);
   const [changing, setChanging] = useState(false);
   const [voting, setVoting] = useState(false);
@@ -132,8 +136,9 @@ function PollView({ data, refetch }: { data: PollBundle; refetch: () => Promise<
       </>}
       {poll.expected_voters != null && poll.expected_voters > 0 && <div className="text-sm text-ink-muted"><p>{t("votedOfExpected", { x: total, n: poll.expected_voters })}</p><progress aria-label={t("turnout")} value={Math.min(total, poll.expected_voters)} max={poll.expected_voters} className="mt-2 h-2 w-full accent-primary" /></div>}
     </section>}
-    <PendingList options={pending} />
+    {!isOwner && <PendingList options={pending} />}
     {isOpen && poll.allow_suggestions && <SuggestCard existing={options.filter((o) => o.status !== "REJECTED")} requireApproval={poll.require_approval} avatarUrl={profile.avatarUrl} onSubmit={suggest} disabled={refreshFailed} />}
+    <CreatorControls poll={poll} options={options} refetch={refetch} onClosed={()=>setClosedLocally(true)} />
     <ShareBar pollId={poll.id} question={poll.question} closed={!isOpen} />
   </article>;
 }

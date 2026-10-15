@@ -1,4 +1,6 @@
 "use client";
+import Link from "next/link";
+import { useCreatorCopy } from "@/lib/creator/copy";
 import { PLAY_STORE_URL } from "@/lib/config";
 
 import { dicebearUrl } from "@/lib/avatars";
@@ -31,6 +33,7 @@ export function Landing() {
 }
 
 function Hero() {
+  const c = useCreatorCopy();
   const { t } = useI18n();
   return (
     <section className="mx-auto grid w-full max-w-6xl items-center gap-14 px-4 pt-10 pb-20 sm:px-6 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:pt-16 lg:pb-28">
@@ -42,7 +45,7 @@ function Hero() {
         <h1 className="headline-pop mt-5 text-5xl leading-[1.02] sm:text-6xl lg:text-7xl">{t("heroTitle")}</h1>
         <p className="mt-5 max-w-xl text-lg text-ink-muted">{t("heroBody")}</p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <a href={PLAY_STORE_URL} className={buttonClass("primary", "min-h-14 px-7 text-lg")}>{t("ctaAndroid")}</a>
+          <Link href="/app" className={buttonClass("primary", "min-h-14 px-7 text-lg")}>{c("newPoll")}</Link>
           <a href="#how" className={buttonClass("text", "min-h-14 px-7 text-lg")}>
             {t("ctaHow")}
           </a>

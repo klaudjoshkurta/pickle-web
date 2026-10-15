@@ -2,6 +2,8 @@ export type PollStatus = "OPEN" | "CLOSED";
 export type OptionStatus = "APPROVED" | "PENDING" | "REJECTED";
 
 export interface Poll {
+  template_id?: string | null;
+  template_round?: number | null;
   voting_mode?: "SINGLE" | "MULTIPLE";
   voter_count?: number | null;
   id: string;

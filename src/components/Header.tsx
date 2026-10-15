@@ -2,12 +2,14 @@
 import Link from "next/link";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { useI18n } from "@/lib/i18n/LocaleContext";
+import { useCreatorCopy } from "@/lib/creator/copy";
 import { PLAY_STORE_URL } from "@/lib/config";
 import { Wordmark } from "./Logo";
 import { buttonClass } from "./ui/Button";
 
 export function Header({ landing = false }: { landing?: boolean }) {
   const { t } = useI18n();
+  const c = useCreatorCopy();
   const { profile, openProfile } = useAuth();
   return (
     <header className="flex w-full flex-wrap items-center gap-x-4 gap-y-3 px-4 py-4 sm:px-6 sm:py-5 lg:px-10">
@@ -20,6 +22,7 @@ export function Header({ landing = false }: { landing?: boolean }) {
           <Link href="/blog" className={buttonClass("text")}>{t("navBlog")}</Link>
           <Link href="/changelog" className={buttonClass("text")}>{t("navChangelog")}</Link>
         </nav>
+        <Link href="/app" className={buttonClass("outline")}>{c("app")}</Link>
         <a href={PLAY_STORE_URL} aria-label={t("footerCta")} className={buttonClass("primary", "px-4")}>
           <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5 shrink-0"><path d="M4 3.5a1 1 0 0 1 1.5-.86l14.4 8.5a1 1 0 0 1 0 1.72L5.5 21.36A1 1 0 0 1 4 20.5z" /></svg>
           Google Play

@@ -12,7 +12,7 @@ const footerLinkClass = "inline-flex min-h-11 items-center rounded text-base tex
 export function SiteFooter() {
   const { locale, setLocale, t } = useI18n();
   const pathname = usePathname();
-  if (pathname.startsWith("/p/")) return <footer className="mx-auto mt-auto flex w-full max-w-180 flex-wrap items-center justify-between gap-3 px-4 py-6 text-sm text-ink-muted"><span>Pickle</span><div role="group" aria-label={t("languageLabel")}>{LOCALES.map((l) => <button key={l} onClick={() => setLocale(l)} aria-pressed={locale === l} className="min-h-11 min-w-11 rounded-full px-3 font-bold aria-pressed:bg-primary-soft aria-pressed:text-primary focus-visible:outline-2 focus-visible:outline-primary">{l.toUpperCase()}</button>)}</div></footer>;
+  if (pathname.startsWith("/p/") || pathname === "/app" || pathname.startsWith("/app/")) return <footer className="mx-auto mt-auto flex w-full max-w-180 flex-wrap items-center justify-between gap-3 px-4 py-6 text-sm text-ink-muted"><span>Pickle</span><div role="group" aria-label={t("languageLabel")}>{LOCALES.map((l) => <button key={l} onClick={() => setLocale(l)} aria-pressed={locale === l} className="min-h-11 min-w-11 rounded-full px-3 font-bold aria-pressed:bg-primary-soft aria-pressed:text-primary focus-visible:outline-2 focus-visible:outline-primary">{l.toUpperCase()}</button>)}</div></footer>;
   return (
     <footer className="mt-auto w-full bg-surface">
       <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 sm:py-12">

@@ -11,6 +11,8 @@ export interface Profile {
 }
 
 interface AuthValue {
+  restored: boolean;
+  signOut: () => Promise<void>;
   user: User | null;
   /** True once a session (anonymous or real) exists. */
   ready: boolean;
@@ -40,6 +42,8 @@ function profileOf(user: User | null): Profile {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [ready, setReady] = useState(false);
+  const [restored, setRestored] = useState(false);
+  const intentionalSignOut = useRef(false);
   const [error, setError] = useState<Error | null>(null);
   const [attempt, setAttempt] = useState(0);
   // Anonymous sign-in only happens once a page asks for a session (poll pages), so
@@ -57,6 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const supabase = getSupabase();
       const { data, error: sessionError } = await supabase.auth.getSession();
       if (cancelled) return;
+      setRestored(true);
       if (sessionError) throw sessionError;
       if (data.session) {
         setUser(data.session.user);
@@ -78,7 +83,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setReady(true);
     })().catch((err: Error) => {
       // e.g. missing env vars; poll pages show this as the error state.
-      if (!cancelled) setError(err);
+      if (!cancelled) { setError(err); setRestored(true); }
     });
     return () => {
       cancelled = true;
@@ -99,10 +104,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setReady(true);
         setError(null);
       } else if (_event !== "INITIAL_SESSION") {
-        sessionLost.current = true;
+        sessionLost.current = !intentionalSignOut.current;
         setUser(null);
         setReady(false);
-        setError(new Error("Session expired. Sign in again."));
+        setError(intentionalSignOut.current ? null : new Error("Session expired. Sign in again."));
         pending.current?.(false);
         pending.current = null;
         setDialogOpen(false);
@@ -112,6 +117,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const profile = useMemo(() => profileOf(user), [user]);
+  const signOut = useCallback(async () => {
+    intentionalSignOut.current = true;
+    try {
+      const { error } = await getSupabase().auth.signOut();
+      if (error) throw error;
+      setWanted(false);
+      sessionLost.current = false;
+      setError(null);
+    } finally { intentionalSignOut.current = false; }
+  }, []);
 
   const requireProfile = useCallback(() => {
     if (profile.displayName && profile.avatarUrl) return Promise.resolve(true);
@@ -136,6 +151,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo<AuthValue>(
     () => ({
+      restored,
+      signOut,
       user,
       ready,
       error,
@@ -145,7 +162,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       requireProfile,
       openProfile,
     }),
-    [user, ready, error, profile, requireProfile, openProfile, ensureSession],
+    [restored, signOut, user, ready, error, profile, requireProfile, openProfile, ensureSession],
   );
 
   return (
