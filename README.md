@@ -73,15 +73,15 @@ No `_redirects` or `vercel.json` rewrite is needed on either platform.
 ## How it works
 
 - **Auth** ([src/lib/auth/AuthContext.tsx](src/lib/auth/AuthContext.tsx)): restores the persisted session (localStorage) or calls `signInAnonymously()`. Before the first vote or suggestion it asks for a display name and a DiceBear avatar, stored with `updateUser({ data: { display_name, avatar_url } })`.
-- **Data** ([src/lib/pollApi.ts](src/lib/pollApi.ts)): loads the poll, its options (by `created_at`) and the user's own vote in parallel. Votes go through the `cast_vote` RPC, and its exceptions map to friendly messages.
+- **Data** ([src/lib/pollApi.ts](src/lib/pollApi.ts)): loads the poll, its ordered options, the user's complete ballot, and their legacy single vote in parallel. Votes go through the `cast_ballot` RPC, and its exceptions map to friendly messages.
 - **Live updates** ([src/lib/usePoll.ts](src/lib/usePoll.ts)): a Supabase Realtime channel on `polls` and `poll_options` for this poll, with 10s polling as a fallback and a refresh when the tab becomes visible again.
 - **Visibility rules** ([src/lib/pollLogic.ts](src/lib/pollLogic.ts)): approved options for everyone, plus the voter's own pending suggestions. Results are hidden until the voter votes unless `show_results_before_voting` is set or the poll is closed.
 - **Strings**: all copy is in [src/lib/i18n/translations.ts](src/lib/i18n/translations.ts).
 
 ## Design
 
-- **Palette:** cream paper (`#FAF2E3`), dark-brown ink outlines (`#3A2417`), tomato (`#E0532B`), mustard (`#F3C24F`), and deep teal (`#007564`) for actions and bars. The tokens live in `@theme` in [src/app/globals.css](src/app/globals.css).
-- **Type:** Google Sans for body text and headings in English and Greek. Headings use bold weight without text shadows.
+- **Marketing palette:** cream paper (`#FAF2E3`), dark-brown ink outlines (`#3A2417`), tomato (`#E0532B`), mustard (`#F3C24F`), and deep teal (`#007564`) for actions and bars. The tokens live in `@theme` in [src/app/globals.css](src/app/globals.css).
+- **Type:** marketing retains Google Sans. Poll pages use Rubik with Google Sans for Greek glyphs, heavy headings, and Android’s mustard offset shadow. Both fonts are bundled locally under `public/fonts` with their OFL licenses.
 - **Results layout:** the top option gets a tomato "In the lead" / "Winner" card with per-vote segments. The others sit in an outlined list with teal bars. The landing page reuses these same components with demo data.
 - **Contrast:** white text on tomato is used only for large or bold text. Smaller labels sit on the deeper tomato pill so they meet WCAG AA.
 - **Motion:** bars and segments animate in, and the live dot pulses. All of it turns off under `prefers-reduced-motion`.
@@ -90,3 +90,19 @@ No `_redirects` or `vercel.json` rewrite is needed on either platform.
 
 - `PLAY_STORE_URL` in [src/lib/config.ts](src/lib/config.ts) (Play Store listing).
 - `SHARE_BASE` in the same file, if the public domain changes.
+
+## Android voter parity — 15 October 2026
+
+Public poll pages follow the current Android implementation and its handoff README. The older design boards are supporting references, not a feature checklist. See [validation and captures](docs/voter-parity.md).
+
+- Compact checkmark/Pickle header, Android light/dark tokens, Rubik type, individual option cards, a submitted-vote banner, and phone bottom actions. Theme changes follow the OS; marketing layouts retain their own styling.
+- Single-choice radios and multiple-choice checkboxes restore complete saved selections. Empty or unchanged ballots cannot be submitted; Keep my vote cancels changes.
+- Reads the current user's poll_ballots with explicit voter filtering, giving them precedence over legacy votes. All submissions replace the complete set through cast_ballot(p_poll_id, p_option_ids). Approved choices sort by position, timestamp, then ID.
+- Results use voter_count as the denominator, falling back to approved selection totals only for legacy records without a voter count. Multiple-choice percentages may total above 100%; voters and selections are labeled separately. Percentages truncate like Android, and result bars use the same denominator.
+- Equal highest counts stay tied, including on older rows carrying a winner field. Closed zero-vote polls show an explicit empty result. Expired deadlines disable voting immediately while expire_poll finalizes server state.
+- Identity uses ten Notionists avatar choices. New identities require an explicit face selection; shuffling clears it. Existing names and avatars are preserved. Forms use bottom sheets on phones and modal dialogs on desktop.
+- A successful write followed by a failed refresh shows a Saved message and Refresh action. Refresh never repeats the write. Account changes clear in-progress selections.
+
+Intentional web differences: link recipients can vote through persisted anonymous sessions, with optional email authentication; Android requires an account. Web keeps realtime updates with polling fallback and Web Share with clipboard fallback. Creator features remain in Android. Reopening, sudden death, result replays, backer lists, and image-card downloads are not implemented by this update.
+
+No production data mutations or schema changes are needed for this client update. The target deployment's ballot contract was checked read-only; see [shared database notes](docs/database.md).

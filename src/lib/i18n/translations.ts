@@ -2,6 +2,15 @@ export type Locale = "en" | "el";
 export const LOCALES: Locale[] = ["en", "el"];
 
 const en = {
+  avatarRequired: "Pick your face before continuing.",
+  pickAnOption: "Pick an option", pickSeveral: "Pick one or more",
+  voteForOption: "Vote for {option}", changeToOption: "Change to {option}",
+  submitSelections: "Submit {n} selections", updateSelections: "Update {n} selections",
+  youreIn: "You're in, {name}!", savedRefreshFailed: "Saved. Couldn't refresh the latest data.",
+  refresh: "Refresh", noVotesTitle: "No votes yet", noVotesClosed: "This poll closed without any votes.",
+  deadHeat: "Dead heat!", crewPicked: "The crew picked", turnout: "Turnout",
+  votersSelections: "{voters} voters · {selections} selections", wonBy: "won by {n}", votersOf: "{x} of {n} voters",
+
   switchWarning: "Signing into an existing account switches identity. Guest votes and suggestions are not transferred.",
   finishAccount: "Finish saving your account",
   finishAccountHint: "After verifying your email, set a password to finish saving this account.",
@@ -193,6 +202,15 @@ export type PluralKey = {
 }[keyof Messages];
 
 const el: Messages = {
+  avatarRequired: "Διάλεξε ένα avatar για να συνεχίσεις.",
+  pickAnOption: "Διάλεξε μια επιλογή", pickSeveral: "Διάλεξε μία ή περισσότερες",
+  voteForOption: "Ψήφισε {option}", changeToOption: "Αλλαγή σε {option}",
+  submitSelections: "Υποβολή {n} επιλογών", updateSelections: "Ενημέρωση {n} επιλογών",
+  youreIn: "Μέσα, {name}!", savedRefreshFailed: "Αποθηκεύτηκε. Δεν ήταν δυνατή η ανανέωση των δεδομένων.",
+  refresh: "Ανανέωση", noVotesTitle: "Καμία ψήφος ακόμη", noVotesClosed: "Η ψηφοφορία έκλεισε χωρίς ψήφους.",
+  deadHeat: "Ισοπαλία!", crewPicked: "Η παρέα διάλεξε", turnout: "Συμμετοχή",
+  votersSelections: "{voters} ψηφοφόροι · {selections} επιλογές", wonBy: "κέρδισε με {n}", votersOf: "{x} από {n} ψηφοφόρους",
+
   blogDescription: "Ιδέες, νέα και καλύτεροι τρόποι να κάνετε σχέδια μαζί.",
   blogEmpty: "Δεν υπάρχουν άρθρα ακόμα. Επιστρέψτε σύντομα για νέα από το Pickle.",
   blogReadArticle: "Διαβάστε το άρθρο",

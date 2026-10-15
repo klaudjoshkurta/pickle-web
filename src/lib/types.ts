@@ -2,6 +2,8 @@ export type PollStatus = "OPEN" | "CLOSED";
 export type OptionStatus = "APPROVED" | "PENDING" | "REJECTED";
 
 export interface Poll {
+  voting_mode?: "SINGLE" | "MULTIPLE";
+  voter_count?: number | null;
   id: string;
   question: string;
   creator_id: string;
@@ -17,6 +19,7 @@ export interface Poll {
 }
 
 export interface PollOption {
+  position?: number | null;
   id: string;
   poll_id: string;
   text: string;
@@ -30,5 +33,5 @@ export interface PollBundle {
   poll: Poll;
   options: PollOption[];
   /** option_id of the current user's vote, if any */
-  myVoteOptionId: string | null;
+  myVoteOptionIds: string[];
 }

@@ -18,11 +18,11 @@ export function totalVotes(options: PollOption[]): number {
 }
 
 export function percentOf(count: number, total: number): number {
-  return total > 0 ? Math.round((count / total) * 100) : 0;
+  return total > 0 ? Math.floor((count * 100) / total) : 0;
 }
 
 export function canShowResults(poll: Poll, hasVoted: boolean): boolean {
-  return poll.status === "CLOSED" || hasVoted || poll.show_results_before_voting;
+  return !isPollOpen(poll) || hasVoted || poll.show_results_before_voting;
 }
 
 export function normalizeOptionText(text: string) {
@@ -46,20 +46,15 @@ export function mapVoteError(message: string | undefined | null): VoteErrorKey {
 
 export type Standing =
   | { kind: "empty" }
-  /** One option has strictly the most votes (or was declared winner). */
+  /** One option has strictly the most positive votes. */
   | { kind: "leader"; option: PollOption; margin: number; final: boolean }
   | { kind: "tie"; options: PollOption[]; final: boolean };
 
-/** Who is on top: the declared winner for closed polls, otherwise the vote leader. */
+/** Android ranks by approved counts; legacy winner fields cannot resolve a tie. */
 export function standing(poll: Poll, approved: PollOption[]): Standing {
   const total = totalVotes(approved);
-  const final = poll.status === "CLOSED";
+  const final = !isPollOpen(poll);
   const sorted = [...approved].sort((a, b) => b.vote_count - a.vote_count);
-  const winner = poll.winner_option_id ? approved.find((o) => o.id === poll.winner_option_id) : undefined;
-  if (final && winner) {
-    const runnerUp = sorted.find((o) => o.id !== winner.id)?.vote_count ?? 0;
-    return { kind: "leader", option: winner, margin: winner.vote_count - runnerUp, final };
-  }
   if (total === 0 || sorted.length === 0) return { kind: "empty" };
   const top = sorted[0].vote_count;
   const tied = sorted.filter((o) => o.vote_count === top);
@@ -67,8 +62,29 @@ export function standing(poll: Poll, approved: PollOption[]): Standing {
   return { kind: "leader", option: sorted[0], margin: top - (sorted[1]?.vote_count ?? 0), final };
 }
 
-/** Segmented bar: one segment per vote, capped at 20 segments (then 5% each). */
-export function segments(count: number, total: number, max = 20): { filled: number; size: number } {
+export function isPollOpen(poll: Pick<Poll, "status" | "closed_at">, now = Date.now()) {
+  return poll.status === "OPEN" && !deadlinePassed(poll, now);
+}
+
+export function voterCount(poll: Poll, options: PollOption[]) {
+  return poll.voter_count ?? totalVotes(options);
+}
+
+export function orderOptions(options: PollOption[]) {
+  return [...options].sort((a, b) => (a.position ?? 0) - (b.position ?? 0) ||
+    Date.parse(a.created_at) - Date.parse(b.created_at) || a.id.localeCompare(b.id));
+}
+
+export function sameBallot(a: readonly string[], b: readonly string[]) {
+  return a.length === b.length && a.every((id) => b.includes(id));
+}
+
+export function restoreBallot(ballot: { option_ids: string[] } | null, legacy: { option_id: string } | null) {
+  return ballot ? [...ballot.option_ids] : legacy ? [legacy.option_id] : [];
+}
+
+/** Android's meter uses one block per voter, capped at twelve proportional blocks. */
+export function segments(count: number, total: number, max = 12): { filled: number; size: number } {
   if (total <= 0) return { filled: 0, size: 10 };
   if (total <= max) return { filled: count, size: total };
   return { filled: Math.round((count / total) * max), size: max };

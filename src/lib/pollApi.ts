@@ -1,5 +1,5 @@
 import { getSupabase } from "./supabase";
-import { deadlinePassed, isUuid } from "./pollLogic";
+import { deadlinePassed, isUuid, orderOptions, restoreBallot } from "./pollLogic";
 import type { Poll, PollBundle, PollOption } from "./types";
 
 export class PollNotFoundError extends Error {
@@ -9,13 +9,14 @@ export class PollNotFoundError extends Error {
   }
 }
 
-export async function fetchPollBundle(pollId: string): Promise<PollBundle> {
+export async function fetchPollBundle(pollId: string, userId: string): Promise<PollBundle> {
   if (!isUuid(pollId)) throw new PollNotFoundError();
 
-  const [pollRes, optionsRes, voteRes] = await Promise.all([
+  const [pollRes, optionsRes, voteRes, ballotRes] = await Promise.all([
     getSupabase().from("polls").select("*").eq("id", pollId).maybeSingle<Poll>(),
     getSupabase().from("poll_options").select("*").eq("poll_id", pollId).order("created_at").returns<PollOption[]>(),
-    getSupabase().from("votes").select("option_id").eq("poll_id", pollId).maybeSingle<{ option_id: string }>(),
+    getSupabase().from("votes").select("option_id").eq("poll_id", pollId).eq("voter_id", userId).maybeSingle<{ option_id: string }>(),
+    getSupabase().from("poll_ballots").select("option_ids").eq("poll_id", pollId).eq("voter_id", userId).maybeSingle<{ option_ids: string[] }>(),
   ]);
 
   if (pollRes.error?.code === "22P02") throw new PollNotFoundError();
@@ -34,16 +35,17 @@ export async function fetchPollBundle(pollId: string): Promise<PollBundle> {
   }
   if (optionsRes.error) throw optionsRes.error;
   if (voteRes.error) throw voteRes.error;
+  if (ballotRes.error) throw ballotRes.error;
 
   return {
     poll: pollRes.data,
-    options: optionsRes.data ?? [],
-    myVoteOptionId: voteRes.data?.option_id ?? null,
+    options: orderOptions(optionsRes.data ?? []),
+    myVoteOptionIds: restoreBallot(ballotRes.data, voteRes.data),
   };
 }
 
-export async function castVote(pollId: string, optionId: string) {
-  const { error } = await getSupabase().rpc("cast_vote", { p_poll_id: pollId, p_option_id: optionId });
+export async function castBallot(pollId: string, optionIds: string[]) {
+  const { error } = await getSupabase().rpc("cast_ballot", { p_poll_id: pollId, p_option_ids: optionIds });
   if (error) throw error;
 }
 
@@ -51,8 +53,8 @@ export async function suggestOption(poll: Poll, text: string, userId: string) {
   const { error } = await getSupabase().from("poll_options").insert({
     poll_id: poll.id,
     text,
-    suggested_by: userId,
-    status: poll.require_approval ? "PENDING" : "APPROVED",
+    suggested_by: userId === poll.creator_id ? null : userId,
+    status: poll.require_approval && userId !== poll.creator_id ? "PENDING" : "APPROVED",
   });
   if (error) throw error;
 }

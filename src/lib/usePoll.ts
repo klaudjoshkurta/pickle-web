@@ -25,26 +25,29 @@ export function usePoll(pollId: string, enabled: boolean, userId: string | null)
   const identity = `${pollId}:${userId ?? ""}`;
   const [loadedIdentity, setLoadedIdentity] = useState<string | null>(null);
 
-  const refetch = useCallback((): Promise<void> => {
+  const refetch = useCallback((): Promise<boolean> => {
+    if (!userId) return Promise.resolve(false);
     // Only the most recent request may write state, so a slow background poll can't
     // overwrite the fresher result fetched right after a vote.
     const mine = ++seq.current;
-    return fetchPollBundle(pollId).then(
+    return fetchPollBundle(pollId, userId).then(
       (data) => {
-        if (mine !== seq.current) return;
+        if (mine !== seq.current) return false;
         loaded.current = true;
         setLoadedIdentity(identity);
         setState({ kind: "ready", data });
+        return true;
       },
       (err) => {
-        if (mine !== seq.current) return;
+        if (mine !== seq.current) return false;
         setLoadedIdentity(identity);
         if (err instanceof PollNotFoundError) setState({ kind: "notFound" });
         // Keep showing stale data on background failures; only surface errors before first load.
         else if (!loaded.current) setState({ kind: "error" });
+        return false;
       },
     );
-  }, [pollId, identity]);
+  }, [pollId, identity, userId]);
 
   const retry = useCallback(() => {
     setState({ kind: "loading" });

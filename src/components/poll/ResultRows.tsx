@@ -18,7 +18,7 @@ export interface ResultRowData {
 export function ResultRows({ rows, avatarUrl, appearance = "outlined", barMaxCount }: { rows: ResultRowData[]; avatarUrl?: string | null; appearance?: "outlined" | "soft"; barMaxCount?: number }) {
   if (rows.length === 0) return null;
   return (
-    <ul className={`@container divide-surface-variant overflow-hidden ${appearance === "soft" ? "rounded-card bg-paper divide-y" : "card divide-y-2 divide-dashed"}`}>
+    <ul className={`result-rows @container divide-surface-variant overflow-hidden ${appearance === "soft" ? "rounded-card bg-paper divide-y" : "card divide-y-2 divide-dashed"}`}>
       {rows.map((row) => (
         <ResultRow key={row.id} row={row} avatarUrl={avatarUrl} barMaxCount={barMaxCount} />
       ))}

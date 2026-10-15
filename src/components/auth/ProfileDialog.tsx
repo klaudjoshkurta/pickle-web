@@ -44,8 +44,8 @@ function ProfileStep({
   const { t } = useI18n();
   const { profile } = useAuth();
   const [name, setName] = useState(profile.displayName ?? "");
-  const [seeds, setSeeds] = useState(() => randomSeeds(6));
-  const [avatar, setAvatar] = useState(() => profile.avatarUrl ?? dicebearUrl(seeds[0]));
+  const [seeds, setSeeds] = useState(() => randomSeeds(10));
+  const [avatar, setAvatar] = useState<string | null>(() => profile.avatarUrl);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const nameId = useId();
@@ -53,13 +53,14 @@ function ProfileStep({
   const avatarLabelId = useId();
   const avatarRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
-  const urls = seeds.map(dicebearUrl);
-  const selectedIndex = urls.indexOf(avatar);
+  const urls = [...(profile.avatarUrl && !seeds.map(dicebearUrl).includes(profile.avatarUrl) ? [profile.avatarUrl] : []), ...seeds.map(dicebearUrl)];
+  const selectedIndex = avatar ? urls.indexOf(avatar) : -1;
 
   function shuffle() {
-    const next = randomSeeds(6);
+    const next = randomSeeds(10);
     setSeeds(next);
-    setAvatar(dicebearUrl(next[0]));
+    setAvatar(null);
+    setError(null);
   }
 
   function onAvatarKey(e: React.KeyboardEvent, i: number) {
@@ -68,6 +69,7 @@ function ProfileStep({
     e.preventDefault();
     const next = (i + delta + urls.length) % urls.length;
     setAvatar(urls[next]);
+    setError(null);
     avatarRefs.current[next]?.focus();
   }
 
@@ -78,6 +80,7 @@ function ProfileStep({
       setError(t("displayNameRequired"));
       return;
     }
+    if (!avatar) { setError(t("avatarRequired")); return; }
     setSaving(true);
     setError(null);
     const { error } = await getSupabase().auth.updateUser({ data: { display_name: displayName, avatar_url: avatar } });
@@ -102,11 +105,11 @@ function ProfileStep({
       <input
         id={nameId}
         value={name}
-        onChange={(e) => setName(e.target.value)}
+        onChange={(e) => { setName(e.target.value); setError(null); }}
         maxLength={40}
         autoComplete="nickname"
         required
-        aria-invalid={!!error}
+        aria-invalid={!!error && error !== t("avatarRequired")}
         aria-describedby={error ? errorId : undefined}
         className="field mt-1"
       />
@@ -119,7 +122,7 @@ function ProfileStep({
           <ShuffleIcon /> {t("shuffle")}
         </Button>
       </div>
-      <div role="radiogroup" aria-labelledby={avatarLabelId} className="mt-2 grid grid-cols-6 gap-2">
+      <div role="radiogroup" aria-required="true" aria-invalid={error === t("avatarRequired")} aria-describedby={error === t("avatarRequired") ? errorId : undefined} aria-labelledby={avatarLabelId} className="mt-2 grid grid-cols-5 gap-2">
         {urls.map((url, i) => {
           const checked = url === avatar;
           const focusable = checked || (selectedIndex === -1 && i === 0);
@@ -134,10 +137,10 @@ function ProfileStep({
               aria-checked={checked}
               aria-label={t("avatarOption", { n: i + 1 })}
               tabIndex={focusable ? 0 : -1}
-              onClick={() => setAvatar(url)}
+              onClick={() => { setAvatar(url); setError(null); }}
               onKeyDown={(e) => onAvatarKey(e, i)}
-              className={`aspect-square rounded-2xl bg-surface-variant p-1 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
-                checked ? "ring-2 ring-primary" : ""
+              className={`aspect-square rounded-full border-[1.5px] border-ink bg-surface-variant p-0.5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
+                checked ? "ring-2 ring-mustard ring-offset-2 ring-offset-paper" : ""
               }`}
             >
               {/* eslint-disable-next-line @next/next/no-img-element -- remote SVG avatars */}

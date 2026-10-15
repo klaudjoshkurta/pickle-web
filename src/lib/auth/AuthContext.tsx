@@ -20,7 +20,7 @@ interface AuthValue {
   retry: () => void;
   /** Ensures a session exists, signing in anonymously if needed. */
   ensureSession: () => void;
-  /** Resolves true once the user has a display name, opening the profile dialog if needed. */
+  /** Resolves true once the user has a display name and avatar, opening the profile dialog if needed. */
   requireProfile: () => Promise<boolean>;
   /** Opens the profile dialog to edit name/avatar. */
   openProfile: () => void;
@@ -114,13 +114,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const profile = useMemo(() => profileOf(user), [user]);
 
   const requireProfile = useCallback(() => {
-    if (profile.displayName) return Promise.resolve(true);
+    if (profile.displayName && profile.avatarUrl) return Promise.resolve(true);
     pending.current?.(false);
     setDialogOpen(true);
     return new Promise<boolean>((resolve) => {
       pending.current = resolve;
     });
-  }, [profile.displayName]);
+  }, [profile.displayName, profile.avatarUrl]);
 
   const openProfile = useCallback(() => {
     pending.current?.(false);

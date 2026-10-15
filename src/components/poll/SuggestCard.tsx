@@ -6,15 +6,18 @@ import type { MessageKey } from "@/lib/i18n/translations";
 import { isDuplicateOption, normalizeOptionText } from "@/lib/pollLogic";
 import type { PollOption } from "@/lib/types";
 import { PlusIcon } from "../icons";
+import { Dialog } from "../ui/Dialog";
 import { Button } from "../ui/Button";
 
-/** Speech-bubble card (notch on top) for suggesting a new option. */
+/** Inline entry point with a phone sheet / desktop dialog for suggestions. */
 export function SuggestCard({
   existing,
   requireApproval,
   avatarUrl,
   onSubmit,
+  disabled = false,
 }: {
+  disabled?: boolean;
   existing: PollOption[];
   requireApproval: boolean;
   avatarUrl: string | null;
@@ -22,6 +25,7 @@ export function SuggestCard({
   onSubmit: (text: string) => Promise<MessageKey | null>;
 }) {
   const { t } = useI18n();
+  const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
   const [error, setError] = useState<MessageKey | null>(null);
   const [busy, setBusy] = useState(false);
@@ -39,13 +43,15 @@ export function SuggestCard({
     const err = await onSubmit(value);
     setBusy(false);
     if (err) setError(err);
-    else setText("");
+    else { setText(""); setOpen(false); }
   }
 
   return (
-    <section aria-labelledby={titleId} className="relative pt-2">
-      <span aria-hidden className="absolute top-0.5 left-10 z-10 h-4 w-4 rotate-45 border-t-2 border-l-2 border-ink bg-paper" />
-      <form onSubmit={submit} noValidate className="card flex gap-4 p-5 sm:p-6">
+    <section className="relative pt-2">
+      <Button variant="outline" className="w-full border-dashed text-primary" disabled={disabled} onClick={() => setOpen(true)}><PlusIcon size={18} />{t("suggestTitle")}</Button>
+      <Dialog open={open} onClose={() => { if (!busy) setOpen(false); }} labelledBy={titleId}>
+
+      <form onSubmit={submit} noValidate className="flex gap-4">
         <span aria-hidden className="hidden h-12 w-12 shrink-0 overflow-hidden rounded-full border-2 border-ink bg-mustard sm:block">
           {avatarUrl && (
             // eslint-disable-next-line @next/next/no-img-element -- remote SVG avatar
@@ -85,6 +91,7 @@ export function SuggestCard({
           )}
         </div>
       </form>
+      </Dialog>
     </section>
   );
 }

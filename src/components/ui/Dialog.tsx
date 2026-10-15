@@ -34,7 +34,7 @@ export function Dialog({
       onClick={(e) => {
         if (e.target === ref.current) onClose();
       }}
-      className="m-auto w-[calc(100%-2rem)] max-w-110 rounded-card border-2 border-ink bg-paper p-0 text-ink backdrop:bg-ink/50"
+      className="app-dialog m-auto w-[calc(100%-2rem)] max-w-110 rounded-card border-2 border-ink bg-paper p-0 text-ink backdrop:bg-ink/50"
     >
       {open && <div className="p-6">{children}</div>}
     </dialog>

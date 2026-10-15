@@ -2,12 +2,13 @@
 
 import { useI18n } from "@/lib/i18n/LocaleContext";
 import { formatRelative } from "@/lib/relativeTime";
+import { isPollOpen } from "@/lib/pollLogic";
 import type { Poll } from "@/lib/types";
 import { ClockIcon, LockIcon } from "../icons";
 
 export function StatusPills({ poll, showCreated = true }: { poll: Poll; showCreated?: boolean }) {
   const { t, locale } = useI18n();
-  const open = poll.status === "OPEN";
+  const open = isPollOpen(poll);
   const when = open ? poll.created_at : poll.closed_at;
   const deadline = poll.closed_at ? new Date(poll.closed_at) : null;
   const deadlineLabel = deadline && (deadline.toDateString() === new Date().toDateString()

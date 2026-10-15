@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  isPollOpen, voterCount, orderOptions, sameBallot, restoreBallot,
   canShowResults,
   deadlinePassed,
   isDuplicateOption,
@@ -104,10 +105,10 @@ describe("standing", () => {
     expect(standing(poll(), [a, b])).toEqual({ kind: "tie", options: [a, b], final: false });
     expect(standing(poll(), [opt(), opt()])).toEqual({ kind: "empty" });
   });
-  it("prefers the declared winner on closed polls", () => {
+  it("keeps equal counts tied even with a legacy winner field", () => {
     const a = opt({ vote_count: 2 }), b = opt({ vote_count: 2 });
     expect(standing(poll({ status: "CLOSED", winner_option_id: b.id }), [a, b])).toEqual({
-      kind: "leader", option: b, margin: 0, final: true,
+      kind: "tie", options: [a, b], final: true,
     });
   });
 });
@@ -115,7 +116,7 @@ describe("standing", () => {
 describe("segments", () => {
   it("uses one segment per vote up to the cap", () => {
     expect(segments(5, 11)).toEqual({ filled: 5, size: 11 });
-    expect(segments(50, 100)).toEqual({ filled: 10, size: 20 });
+    expect(segments(50, 100)).toEqual({ filled: 6, size: 12 });
     expect(segments(0, 0)).toEqual({ filled: 0, size: 10 });
   });
 });
@@ -128,5 +129,39 @@ describe("deadline semantics", () => {
     expect(deadlinePassed({ status: "OPEN", closed_at: cutoff }, Date.parse(cutoff) + 1)).toBe(true);
     expect(deadlinePassed({ status: "CLOSED", closed_at: cutoff }, Date.parse(cutoff))).toBe(false);
     expect(deadlinePassed({ status: "OPEN", closed_at: null })).toBe(false);
+  });
+});
+
+describe("Android ballot parity", () => {
+  it("restores complete ballots ahead of legacy single votes", () => {
+    expect(restoreBallot({ option_ids: ["a", "b"] }, { option_id: "c" })).toEqual(["a", "b"]);
+    expect(restoreBallot(null, { option_id: "c" })).toEqual(["c"]);
+    expect(restoreBallot(null, null)).toEqual([]);
+  });
+  it("compares ballots without depending on selection order", () => {
+    expect(sameBallot(["a", "b"], ["b", "a"])).toBe(true);
+    expect(sameBallot(["a"], ["a", "b"])).toBe(false);
+  });
+  it("uses voters as denominator and counts selections separately", () => {
+    const options = [opt({vote_count: 3}), opt({vote_count: 2})];
+    expect(voterCount(poll({voter_count: 3}), options)).toBe(3);
+    expect(totalVotes(options)).toBe(5);
+    expect(percentOf(2, 3)).toBe(66);
+    expect(percentOf(29, 100)).toBe(29);
+    expect(voterCount(poll(), options)).toBe(5);
+    expect(voterCount(poll({voter_count: 0}), options)).toBe(0);
+  });
+  it("orders by position, timestamp, then ID", () => {
+    const a = opt({id: "a", position: 2}); const b = opt({id: "b", position: 1});
+    const c = opt({id: "c", position: 1, created_at: "2025-01-01T00:00:00Z"});
+    const d = opt({id: "d", position: 1});
+    expect(orderOptions([a,d,b,c]).map(o=>o.id)).toEqual(["c","b","d","a"]);
+  });
+  it("closes voting and reveals results at an elapsed deadline", () => {
+    const expired = poll({closed_at: "2020-01-01T00:00:00Z"});
+    expect(isPollOpen(expired)).toBe(false);
+    expect(canShowResults(expired, false)).toBe(true);
+    expect(isPollOpen(poll({closed_at: "2099-01-01T00:00:00Z"}))).toBe(true);
+    expect(isPollOpen(poll())).toBe(true);
   });
 });

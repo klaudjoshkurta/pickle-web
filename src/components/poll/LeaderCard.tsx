@@ -9,25 +9,26 @@ interface LeaderCardProps {
   text: string;
   count: number;
   total: number;
+  multiple?: boolean;
   percent: number;
   margin: number;
-  ribbon: "lead" | "winner";
+  ribbon: "lead" | "winner" | "tie";
   isMine?: boolean;
   suggestedByYou?: boolean;
   avatarUrl?: string | null;
 }
 
 /** The highlighted top option: tomato card, mustard corner ribbon, big percentage and per-vote segments. */
-export function LeaderCard({ text, count, total, percent, margin, ribbon, isMine, suggestedByYou, avatarUrl, appearance = "outlined" }: LeaderCardProps) {
+export function LeaderCard({ text, count, total, multiple, percent, margin, ribbon, isMine, suggestedByYou, avatarUrl, appearance = "outlined" }: LeaderCardProps) {
   const { t } = useI18n();
   const seg = segments(count, total);
 
   return (
     <section
-      aria-label={`${ribbon === "winner" ? t("winner") : t("inTheLead")}: ${text}`}
-      className={`relative overflow-hidden rounded-card bg-tomato p-5 text-white sm:p-7 ${appearance === "soft" ? "" : "border-2 border-ink"}`}
+      aria-label={`${ribbon === "tie" ? t("tie") : ribbon === "winner" ? t("winner") : t("inTheLead")}: ${text}`}
+      className={`poll-leader relative overflow-hidden rounded-card bg-tomato p-5 text-white sm:p-7 ${appearance === "soft" ? "" : "border-2 border-ink"}`}
     >
-      <Ribbon appearance={appearance}>{ribbon === "winner" ? t("winner") : t("inTheLead")}</Ribbon>
+      <Ribbon appearance={appearance}>{ribbon === "tie" ? t("tie") : ribbon === "winner" ? t("winner") : t("inTheLead")}</Ribbon>
 
       <h2 className="pr-20 font-display text-2xl leading-tight font-bold wrap-break-word sm:pr-28 sm:text-[1.75rem]">{text}</h2>
 
@@ -56,8 +57,8 @@ export function LeaderCard({ text, count, total, percent, margin, ribbon, isMine
           <span className="align-top text-xl">%</span>
         </p>
         <p className="rounded-2xl bg-tomato-deep px-4 py-2 text-sm font-semibold text-white">
-          <span>{t("leaderVotes", { x: count, n: total })}</span>
-          {margin > 0 && <span className="font-medium text-white/90">· {t("aheadBy", { n: margin })}</span>}
+          <span>{t(multiple ? "votersOf" : "leaderVotes", { x: count, n: total })}</span>
+          {margin > 0 && <span className="font-medium text-white/90">· {t(ribbon === "winner" ? "wonBy" : "aheadBy", { n: margin })}</span>}
         </p>
       </div>
 
