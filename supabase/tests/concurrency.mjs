@@ -52,7 +52,28 @@ try {
   const before = await sql(`select status from public.poll_options where id='${pending}';`);
   await sql(`begin; ${claims(owner)} ${whenOpen(`perform public.moderate_option('${poll}','${pending}',false);`)} commit;`);
   assert.equal(await sql(`select status from public.poll_options where id='${pending}';`), before, "Option changed after closure");
-  console.log("Concurrent creation, voting/closing, and moderation/closing checks passed.");
+  const templateId = uuidFrom(await sql(`begin; ${claims(owner)} select public.save_poll_template('${poll}','Race template','film',null,null,'UTC'); commit;`));
+  assert.ok(templateId);
+  const roundRequest=randomUUID();
+  const reuse=`select public.create_poll_v2('Ballot race',array['A','B','C'],false,true,true,true,null,null,'${roundRequest}','MULTIPLE','${templateId}');`;
+  const rounds=await Promise.all([
+    sql(`begin; ${claims(owner)} ${reuse} select pg_sleep(0.3); commit;`),
+    sql(`begin; ${claims(owner)} ${reuse} commit;`),
+  ]);
+  const multi=uuidFrom(rounds[0]);assert.equal(multi,uuidFrom(rounds[1]));
+  assert.equal(await sql(`select rounds_count from public.poll_templates where id='${templateId}';`),'2','Retry incremented history');
+  assert.equal(await sql(`select count(*) from public.notifications where poll_id='${multi}' and type='POLL_CREATED';`),'1');
+  const choiceIds=(await sql(`select id from public.poll_options where poll_id='${multi}' order by position;`)).split(/\s+/);
+  const ballot=(ids)=>`perform public.cast_ballot('${multi}',array[${ids.map(id=>`'${id}'::uuid`).join(',')}]);`;
+  await Promise.all([
+    sql(`begin; ${claims(voter)} ${whenOpen(ballot(choiceIds.slice(0,2)))} select pg_sleep(0.2); commit;`),
+    sql(`begin; ${claims(voter)} ${whenOpen(ballot(choiceIds.slice(1)))} commit;`),
+    sql(`begin; ${claims(owner)} select public.close_poll('${multi}'); commit;`),
+  ]);
+  assert.equal(await sql(`select status from public.polls where id='${multi}';`),'CLOSED');
+  assert.equal(await sql(`select voter_count=(select count(*) from public.poll_ballots where poll_id='${multi}') from public.polls where id='${multi}';`),'t');
+  assert.equal(await sql(`select coalesce(sum(vote_count),0)=(select coalesce(sum(cardinality(option_ids)),0) from public.poll_ballots where poll_id='${multi}') from public.poll_options where poll_id='${multi}';`),'t','Selections differ from complete ballots');
+  console.log('Concurrent creation, template retries, ballot replacement/closing, and moderation/closing checks passed.');
 } finally {
-  await sql(`delete from public.polls where creator_id='${owner}'; delete from auth.users where id in ('${owner}','${voter}');`);
+  await sql(`update public.polls set template_id=null,template_round=null where creator_id='${owner}'; delete from public.poll_templates where owner_id='${owner}'; delete from public.polls where creator_id='${owner}'; delete from auth.users where id in ('${owner}','${voter}');`);
 }

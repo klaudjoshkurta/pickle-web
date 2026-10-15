@@ -2,6 +2,11 @@ export type Locale = "en" | "el";
 export const LOCALES: Locale[] = ["en", "el"];
 
 const en = {
+  multipleChoice: "Multiple choice",
+  leaderVoters: "{x} of {n} voters",
+  selectOptions: "Select every option that works for you.",
+  votersCount: { one: "{n} voter", other: "{n} voters" },
+  selectionsCount: { one: "{n} selection", other: "{n} selections" },
   switchWarning: "Signing into an existing account switches identity. Guest votes and suggestions are not transferred.",
   finishAccount: "Finish saving your account",
   finishAccountHint: "After verifying your email, set a password to finish saving this account.",
@@ -183,6 +188,11 @@ export type PluralKey = {
 }[keyof Messages];
 
 const el: Messages = {
+  multipleChoice: "Πολλαπλές επιλογές",
+  leaderVoters: "{x} από {n} ψηφοφόρους",
+  selectOptions: "Επίλεξε όλες τις επιλογές που σε βολεύουν.",
+  votersCount: { one: "{n} ψηφοφόρος", other: "{n} ψηφοφόροι" },
+  selectionsCount: { one: "{n} επιλογή", other: "{n} επιλογές" },
   switchWarning: "Η σύνδεση σε υπάρχοντα λογαριασμό αλλάζει ταυτότητα. Οι ψήφοι και οι προτάσεις επισκέπτη δεν μεταφέρονται.",
   finishAccount: "Ολοκλήρωση αποθήκευσης λογαριασμού",
   finishAccountHint: "Μετά την επιβεβαίωση του email, όρισε κωδικό για να αποθηκεύσεις τον λογαριασμό.",

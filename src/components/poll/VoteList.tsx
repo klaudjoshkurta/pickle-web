@@ -9,8 +9,9 @@ import { CheckIcon } from "../icons";
 interface Props {
   labelledBy: string;
   options: PollOption[];
-  selectedId: string | null;
-  myVoteId: string | null;
+  selectedIds: string[];
+  multiple: boolean;
+  myVoteIds: string[];
   disabled: boolean;
   /** Show bars/counts next to options (results visible before voting, or while changing a vote). */
   showResults: boolean;
@@ -20,10 +21,10 @@ interface Props {
 }
 
 /** Selectable options as a radio group inside one outlined card. */
-export function VoteList({ labelledBy, options, selectedId, myVoteId, disabled, showResults, total, userId, onSelect }: Props) {
+export function VoteList({ labelledBy, options, selectedIds, multiple, myVoteIds, disabled, showResults, total, userId, onSelect }: Props) {
   const { t, tp } = useI18n();
   const refs = useRef<(HTMLButtonElement | null)[]>([]);
-  const selectedIndex = options.findIndex((o) => o.id === selectedId);
+  const selectedIndex = options.findIndex((o) => selectedIds.includes(o.id));
   // Roving tabindex: the checked radio (or the first) is the single tab stop.
   const tabStop = selectedIndex >= 0 ? selectedIndex : 0;
 
@@ -46,13 +47,13 @@ export function VoteList({ labelledBy, options, selectedId, myVoteId, disabled, 
     if (next === undefined) return;
     e.preventDefault();
     refs.current[next]?.focus();
-    if (!disabled) onSelect(options[next].id);
+    if (!disabled && !multiple) onSelect(options[next].id);
   }
 
   return (
-    <div role="radiogroup" aria-labelledby={labelledBy} aria-disabled={disabled || undefined} className="card divide-y-2 divide-dashed divide-surface-variant p-2">
+    <div role={multiple ? "group" : "radiogroup"} aria-labelledby={labelledBy} aria-disabled={disabled || undefined} className="card divide-y-2 divide-dashed divide-surface-variant p-2">
       {options.map((option, i) => {
-        const checked = option.id === selectedId;
+        const checked = selectedIds.includes(option.id);
         const percent = percentOf(option.vote_count, total);
         return (
           <div key={option.id} className="py-1 first:pt-0 last:pb-0">
@@ -61,9 +62,10 @@ export function VoteList({ labelledBy, options, selectedId, myVoteId, disabled, 
                 refs.current[i] = el;
               }}
               type="button"
-              role="radio"
+              role={multiple ? "checkbox" : "radio"}
               aria-checked={checked}
-              tabIndex={i === tabStop ? 0 : -1}
+              tabIndex={multiple || i === tabStop ? 0 : -1}
+              disabled={disabled}
               onClick={disabled ? undefined : () => onSelect(option.id)}
               onKeyDown={(e) => onKeyDown(e, i)}
               className={`flex min-h-14 w-full flex-col justify-center gap-2 rounded-2xl border-2 px-4 py-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-paper ${
@@ -73,16 +75,16 @@ export function VoteList({ labelledBy, options, selectedId, myVoteId, disabled, 
               <span className="flex w-full items-center gap-3">
                 <span
                   aria-hidden
-                  className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 ${checked ? "border-primary bg-paper" : "border-ink/60 bg-paper"}`}
+                  className={`flex h-6 w-6 shrink-0 items-center justify-center ${multiple ? "rounded-md" : "rounded-full"} border-2 ${checked ? "border-primary bg-paper" : "border-ink/60 bg-paper"}`}
                 >
-                  {checked && <span className="h-3 w-3 rounded-full bg-primary" />}
+                  {checked && (multiple ? <CheckIcon size={16} /> : <span className="h-3 w-3 rounded-full bg-primary" />)}
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block font-semibold wrap-break-word">{option.text}</span>
-                  {(option.id === myVoteId || (userId && option.suggested_by === userId)) && (
+                  {(myVoteIds.includes(option.id) || (userId && option.suggested_by === userId)) && (
                     <span className="mt-0.5 flex flex-wrap gap-x-3 text-sm text-ink-muted">
                       {userId && option.suggested_by === userId && <span>{t("suggestedByYou")}</span>}
-                      {option.id === myVoteId && (
+                      {myVoteIds.includes(option.id) && (
                         <span className="inline-flex items-center gap-1 font-semibold text-primary">
                           <CheckIcon size={14} /> {t("yourPick")}
                         </span>
