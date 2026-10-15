@@ -12,6 +12,9 @@ The web app for **Pickle** group polls. Create and manage polls in the Android a
 | --- | --- |
 | `/` | Landing page with a "Get the Android app" call to action |
 | `/p/:pollId` | The poll: vote, results, suggestions, share |
+| `/blog` | Published articles, in English and Greek with English fallback |
+| `/blog/:slug` | A published blog article |
+| `/keystatic` | GitHub-authenticated content editor |
 
 ## Setup
 
@@ -29,6 +32,13 @@ npm run dev                  # http://localhost:3000
 Both values are public by design. Row Level Security protects the data. Never put the `service_role` key here.
 
 Other scripts: `npm run build`, `npm start`, `npm run lint` and `npm test` (unit tests for poll logic, ballot APIs, and accessible voting controls).
+
+## Blog editing
+
+Keystatic manages blog content in GitHub. See [editor setup and publishing](docs/keystatic.md)
+for GitHub App authorization, environment variables, translations, and the draft workflow.
+Start local editor setup at `http://127.0.0.1:3000/keystatic`. Published content
+appears after its GitHub changes reach the deployment branch and deploy successfully.
 
 ## Supabase prerequisites
 
