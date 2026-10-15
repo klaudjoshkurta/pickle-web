@@ -24,7 +24,7 @@ function sql(input) {
   });
 }
 const owner = randomUUID(); const voter = randomUUID(); const request = randomUUID();
-const poll = randomUUID(); const a = randomUUID(); const b = randomUUID(); const pending = randomUUID();
+let poll; const a = randomUUID(); const b = randomUUID(); const pending = randomUUID();
 const claims = (user) => `set local role authenticated; select set_config('request.jwt.claim.sub','${user}',true);`;
 const create = `select public.create_poll('Concurrency test',array['A','B'],false,true,false,true,null,null,'${request}');`;
 const uuidFrom = (text) => text.match(/[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}/g)?.at(-1);
@@ -37,8 +37,10 @@ try {
   assert.equal(uuidFrom(first), uuidFrom(second), "Concurrent retries created different polls");
   assert.equal(await sql(`select count(*) from public.polls where creator_id='${owner}';`), "1");
 
+  poll=uuidFrom(await sql(`begin; ${claims(owner)}
+    insert into public.polls(question,creator_id,allow_suggestions) values('Voting race','${owner}',true) returning id; commit;`));
+  assert.ok(poll);
   await sql(`begin; ${claims(owner)}
-    insert into public.polls(id,question,creator_id,allow_suggestions) values('${poll}','Voting race','${owner}',true);
     insert into public.poll_options(id,poll_id,text) values('${a}','${poll}','A'),('${b}','${poll}','B'); commit;
     begin; ${claims(voter)} insert into public.poll_options(id,poll_id,text,status,suggested_by) values('${pending}','${poll}','C','PENDING','${voter}'); commit;`);
   const whenOpen = (statement) => `do $$ begin ${statement} exception when others then if sqlerrm <> 'Poll is not open' then raise; end if; end; $$;`;

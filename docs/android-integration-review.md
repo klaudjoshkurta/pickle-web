@@ -8,7 +8,7 @@ strings are included. Stable option ordering uses position, creation time, and I
 
 Validation:
 
-- `npm test`: 18 tests passed (poll logic, API contract/failures, controls and counts).
+- `npm test`: 26 tests passed after merging current master (poll logic, API contract/failures, controls and counts).
 - `npm run lint`: passed.
 - `npm run build`: passed; Google Sans fallback-metadata warning is nonfatal.
 - Browser fixture checks: single submission, Keep my vote, multiple submission and
@@ -20,7 +20,7 @@ Validation:
 
 The Android implementation has Home, starter/personal templates, saved drafts,
 weekly deadlines, and multi-choice voting. Its JVM suite has 74 passing tests,
-and ten device instrumentation checks passed. A full authenticated OS process-kill
+and eleven device instrumentation checks passed. A full authenticated OS process-kill
 restoration cycle and a deployed cross-client multi-choice smoke test remain
 release acceptance checks. The browser checks used only the in-memory fixture
 backend and never submitted real user ballots.
@@ -29,6 +29,12 @@ Database migrations are already applied. Review and release this compatible web
 client before distributing Android. No merge or production rollout is included.
 The checked build used dummy loopback fixture environment values; deployment must
 use the project's real public Supabase URL/key described in the README.
+
+The upstream lockfile had omitted Rolldown platform-binding metadata. Existing
+exact-version entries were restored, with no dependency version upgrades in this
+patch. Windows npm additionally required a local optional-native-binding install
+for the final test run. The existing npm audit reports seven affected packages
+through the braces denial-of-service advisory; remediation remains separate.
 
 The full schema snapshot, versioned migrations, and advisor summary are retained
 in this repository. See [database contracts](database.md) for ownership, ballot,
