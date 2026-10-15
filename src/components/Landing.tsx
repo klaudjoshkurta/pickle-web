@@ -1,5 +1,5 @@
 "use client";
-import Link from "next/link";
+import { PLAY_STORE_URL } from "@/lib/config";
 
 import { dicebearUrl } from "@/lib/avatars";
 import { useI18n } from "@/lib/i18n/LocaleContext";
@@ -42,7 +42,7 @@ function Hero() {
         <h1 className="headline-pop mt-5 text-5xl leading-[1.02] sm:text-6xl lg:text-7xl">{t("heroTitle")}</h1>
         <p className="mt-5 max-w-xl text-lg text-ink-muted">{t("heroBody")}</p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <Link href="/creator/auth" className={buttonClass("primary", "min-h-14 px-7 text-lg")}>{t("createPoll")}</Link>
+          <a href={PLAY_STORE_URL} className={buttonClass("primary", "min-h-14 px-7 text-lg")}>{t("ctaAndroid")}</a>
           <a href="#how" className={buttonClass("text", "min-h-14 px-7 text-lg")}>
             {t("ctaHow")}
           </a>
@@ -182,7 +182,7 @@ function ClosingCta() {
         </span>
         <h2 className="font-display text-4xl leading-tight font-bold sm:text-5xl">{t("ctaBandTitle")}</h2>
         <p className="mx-auto mt-4 max-w-md text-lg leading-relaxed">{t("ctaBandBody")}</p>
-        <Link href="/creator/auth" className={buttonClass("primary", "mt-8 min-h-14 px-8 text-lg")}>{t("createPoll")}</Link>
+        <a href={PLAY_STORE_URL} className={buttonClass("primary", "mt-8 min-h-14 px-8 text-lg")}>{t("ctaAndroid")}</a>
         <p className="mt-6 text-sm">{t("landingHint")}</p>
       </div>
     </section>

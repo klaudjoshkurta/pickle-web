@@ -29,6 +29,11 @@ export function EmailSignIn({
   const passwordId = useId();
   const nameId = useId();
 
+  function emailRedirectTo() {
+    const path = window.location.pathname;
+    return `${window.location.origin}${/^\/p\/[^/]+\/?$/.test(path) ? path : "/"}`;
+  }
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (mode === "signUp" && !name.trim()) {
@@ -58,7 +63,7 @@ export function EmailSignIn({
         const { error } = await getSupabase().auth.updateUser({
           email: email.trim(),
           data: { display_name: name.trim(), avatar_url: user.user_metadata?.avatar_url ?? dicebearUrl(randomSeeds(1)[0]), pickle_account_pending: true },
-        }, { emailRedirectTo: `${window.location.origin}/dashboard` });
+        }, { emailRedirectTo: emailRedirectTo() });
         if (error) throw error;
         setMode("finish"); setPassword("");
         setMessage({ key: "upgradeCheckEmail", tone: "info" });
@@ -81,7 +86,7 @@ export function EmailSignIn({
     const { data, error } = await getSupabase().auth.signUp({
       email: email.trim(),
       password,
-      options: { data: { display_name: name.trim(), avatar_url: dicebearUrl(randomSeeds(1)[0]) } },
+      options: { emailRedirectTo: emailRedirectTo(), data: { display_name: name.trim(), avatar_url: dicebearUrl(randomSeeds(1)[0]) } },
     });
     setBusy(false);
     if (error) {

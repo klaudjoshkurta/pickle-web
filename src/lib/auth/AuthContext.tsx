@@ -65,7 +65,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       if (!wanted) return;
       if (sessionLost.current) {
-        setError(new Error("Creator session lost. Sign in to recover account access."));
+        setError(new Error("Session lost. Sign in to recover your votes and suggestions."));
         return;
       }
       const res = await supabase.auth.signInAnonymously();

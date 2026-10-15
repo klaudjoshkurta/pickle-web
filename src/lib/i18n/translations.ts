@@ -1,13 +1,19 @@
-import { creatorEn, creatorEl } from "./creatorTranslations";
 export type Locale = "en" | "el";
 export const LOCALES: Locale[] = ["en", "el"];
 
 const en = {
-  ...creatorEn,
+  switchWarning: "Signing into an existing account switches identity. Guest votes and suggestions are not transferred.",
+  finishAccount: "Finish saving your account",
+  finishAccountHint: "After verifying your email, set a password to finish saving this account.",
+  upgradeCheckEmail: "Check your email to verify this address, then return here to set your password. Keep this guest session.",
+  upgradeFailed: "Could not save this guest account. Check that anonymous identity linking is enabled and try again.",
   appName: "pickle",
   languageLabel: "Language",
   getTheApp: "Get the app",
   editProfile: "Edit your name and avatar",
+  suggestedOption: "Suggested option",
+  closesTodayAt: "Closes today at {time}",
+  closesOn: "Closes {date}",
 
   // Landing — hero
   heroEyebrow: "Small polls. Real plans.",
@@ -16,7 +22,7 @@ const en = {
     "Dinner, movie night, or the next trip? Make a poll in Pickle, drop the link in your chat, and let everyone have a say.",
   ctaAndroid: "Get Pickle for Android",
   ctaHow: "See how it works",
-  heroNote: "You make the poll. Friends vote in their browser.",
+  heroNote: "Create polls in the Android app. Friends vote in their browser.",
 
   // Landing — demo poll
   demoQuestion: "The important question: which pizza?",
@@ -28,7 +34,7 @@ const en = {
   // Landing — how it works
   howTitle: "Ask. Share. Decide.",
   step1Title: "Start with a question",
-  step1Body: "Create a poll here. Add your options and choose whether friends can suggest more.",
+  step1Body: "Create a poll in the Pickle Android app. Add your options and choose whether friends can suggest more.",
   step2Title: "Send it to the chat",
   step2Body: "Share your poll link wherever your group talks. Friends open it and vote. No app download needed.",
   step3Title: "Make the call",
@@ -173,11 +179,18 @@ export type PluralKey = {
 }[keyof Messages];
 
 const el: Messages = {
-  ...creatorEl,
+  switchWarning: "Η σύνδεση σε υπάρχοντα λογαριασμό αλλάζει ταυτότητα. Οι ψήφοι και οι προτάσεις επισκέπτη δεν μεταφέρονται.",
+  finishAccount: "Ολοκλήρωση αποθήκευσης λογαριασμού",
+  finishAccountHint: "Μετά την επιβεβαίωση του email, όρισε κωδικό για να αποθηκεύσεις τον λογαριασμό.",
+  upgradeCheckEmail: "Έλεγξε το email σου για επιβεβαίωση και επέστρεψε εδώ για να ορίσεις κωδικό. Κράτησε αυτή τη συνεδρία επισκέπτη.",
+  upgradeFailed: "Δεν αποθηκεύτηκε ο λογαριασμός επισκέπτη. Έλεγξε ότι επιτρέπεται η σύνδεση ταυτότητας και δοκίμασε ξανά.",
   appName: "pickle",
   languageLabel: "Γλώσσα",
   getTheApp: "Κατέβασε την εφαρμογή",
   editProfile: "Άλλαξε όνομα και avatar",
+  suggestedOption: "Προτεινόμενη επιλογή",
+  closesTodayAt: "Κλείνει σήμερα στις {time}",
+  closesOn: "Κλείνει {date}",
 
   heroEyebrow: "Μικρές ψηφοφορίες. Μεγάλα σχέδια.",
   heroTitle: "Από το «πού πάμε;» στο «φύγαμε».",
@@ -185,7 +198,7 @@ const el: Messages = {
     "Φαγητό, ταινία ή η επόμενη εκδρομή; Φτιάξε μια ψηφοφορία στο Pickle, στείλε τον σύνδεσμο στο chat και δώσε σε όλους λόγο στην απόφαση.",
   ctaAndroid: "Pickle για Android",
   ctaHow: "Δες πώς λειτουργεί",
-  heroNote: "Εσύ φτιάχνεις την ψηφοφορία. Η παρέα ψηφίζει από τον browser.",
+  heroNote: "Φτιάξε ψηφοφορίες στην εφαρμογή Android. Η παρέα ψηφίζει από τον browser.",
 
   demoQuestion: "Το μεγάλο δίλημμα: ποια πίτσα;",
   demoOption1: "Πεπερόνι",
@@ -195,7 +208,7 @@ const el: Messages = {
 
   howTitle: "Μια ερώτηση. Μια κοινή απόφαση.",
   step1Title: "Ξεκίνα με μια ερώτηση",
-  step1Body: "Φτιάξε μια ψηφοφορία εδώ. Βάλε τις επιλογές σου και διάλεξε αν η παρέα μπορεί να προτείνει κι άλλες.",
+  step1Body: "Φτιάξε μια ψηφοφορία στην εφαρμογή Pickle για Android. Βάλε τις επιλογές σου και διάλεξε αν η παρέα μπορεί να προτείνει κι άλλες.",
   step2Title: "Στείλε τη στο chat",
   step2Body: "Μοιράσου τον σύνδεσμο εκεί που μιλάτε. Οι φίλοι σου τον ανοίγουν και ψηφίζουν, χωρίς να κατεβάσουν εφαρμογή.",
   step3Title: "Πάρτε την απόφαση",

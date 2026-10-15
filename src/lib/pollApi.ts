@@ -1,7 +1,6 @@
 import { getSupabase } from "./supabase";
-import { isUuid } from "./pollLogic";
+import { deadlinePassed, isUuid } from "./pollLogic";
 import type { Poll, PollBundle, PollOption } from "./types";
-import { deadlinePassed } from "./creatorLogic";
 
 export class PollNotFoundError extends Error {
   constructor() {

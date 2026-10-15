@@ -1,6 +1,6 @@
 # Pickle web
 
-The web app for **Pickle** group polls. Creators can make and manage polls on the web or Android and share `https://pickle-web-iota.vercel.app/p/{pollId}`. Voters can vote, see results and suggest options without installing anything.
+The web app for **Pickle** group polls. Create and manage polls in the Android app, then share `https://pickle-web-iota.vercel.app/p/{pollId}`. Voters can vote, see results and suggest options in their browser without installing anything.
 
 - Next.js 16 (App Router) + React 19 + TypeScript + Tailwind CSS v4
 - Supabase JS v2, talking directly to the existing project (no custom backend)
@@ -12,9 +12,6 @@ The web app for **Pickle** group polls. Creators can make and manage polls on th
 | --- | --- |
 | `/` | Landing page with a "Get the Android app" call to action |
 | `/p/:pollId` | The poll: vote, results, suggestions, share |
-| `/create` | Create a real poll as a guest or account holder |
-| `/dashboard` | Current creator's open and closed polls |
-| `/manage/:pollId` | Owner results, suggestions, sharing, and closing |
 
 ## Setup
 
@@ -35,7 +32,7 @@ Other scripts: `npm run build`, `npm start`, `npm run lint` and `npm test` (unit
 
 ## Supabase prerequisites
 
-The schema already exists. Creator functionality needs the additive migrations described in [creator setup and validation](docs/creator-flow.md); migrations are provided but not applied automatically. The project needs:
+The schema already exists. The retained migrations and SQL validation scripts are described in [shared database setup and validation](docs/database.md); migrations are provided but not applied automatically. The project needs:
 
 1. **Anonymous sign-ins enabled** (Authentication → Sign In / Providers). Voters get a silent anonymous session on first visit, because every RLS policy requires `authenticated`.
 2. **Email provider enabled**, for the optional "Sign in with email".
@@ -44,7 +41,8 @@ The schema already exists. Creator functionality needs the additive migrations d
    alter publication supabase_realtime add table public.polls, public.poll_options;
    ```
    The app keeps polling until it receives its first realtime event, and starts polling again whenever the channel drops, so it works either way.
-4. Add the deployed domain to Authentication → URL Configuration (Site URL / Redirect URLs) if you use email confirmation links.
+4. Add the deployed domain and public poll URLs (`/p/*`) to Authentication → URL Configuration (Site URL / Redirect URLs) if you use email confirmation links. Confirmation returns to the current poll, or the homepage outside a poll.
+5. Enable manual identity linking and email verification for guest-account upgrades. After verifying their email, voters return to the poll and reopen email authentication from the profile dialog to finish setting a password. Signing into another account does not transfer guest votes or suggestions.
 
 ## Deploy
 

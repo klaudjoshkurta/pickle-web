@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   canShowResults,
+  deadlinePassed,
   isDuplicateOption,
   isUuid,
   mapVoteError,
@@ -116,5 +117,16 @@ describe("segments", () => {
     expect(segments(5, 11)).toEqual({ filled: 5, size: 11 });
     expect(segments(50, 100)).toEqual({ filled: 10, size: 20 });
     expect(segments(0, 0)).toEqual({ filled: 0, size: 10 });
+  });
+});
+
+describe("deadline semantics", () => {
+  const cutoff = "2026-10-14T12:00:00Z";
+  it("expires at the exact scheduled instant, without treating future closed_at as closure", () => {
+    expect(deadlinePassed({ status: "OPEN", closed_at: cutoff }, Date.parse(cutoff) - 1)).toBe(false);
+    expect(deadlinePassed({ status: "OPEN", closed_at: cutoff }, Date.parse(cutoff))).toBe(true);
+    expect(deadlinePassed({ status: "OPEN", closed_at: cutoff }, Date.parse(cutoff) + 1)).toBe(true);
+    expect(deadlinePassed({ status: "CLOSED", closed_at: cutoff }, Date.parse(cutoff))).toBe(false);
+    expect(deadlinePassed({ status: "OPEN", closed_at: null })).toBe(false);
   });
 });
