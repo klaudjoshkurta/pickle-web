@@ -1,14 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import { Google_Sans } from "next/font/google";
-import { Providers } from "@/components/Providers";
-import { SiteFooter } from "@/components/SiteFooter";
+import localFont from "next/font/local";
+import { Providers } from "@/app/_components/Providers";
 import "../globals.css";
 
-const googleSans = Google_Sans({
-  variable: "--font-google-sans",
-  subsets: ["latin", "greek"],
-  weight: ["400", "500", "600", "700"],
-});
+const rubik = localFont({ src: "../../../public/fonts/Rubik.ttf", variable: "--font-rubik", weight: "400 900", display: "swap" });
 
 export const metadata: Metadata = {
   title: { default: "Pickle: group polls, settled", template: "%s · Pickle" },
@@ -21,10 +16,10 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${googleSans.variable} h-full antialiased`}>
+    <html lang="en" className={`${rubik.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         <Providers>
-          <div className="flex flex-1 flex-col">{children}<SiteFooter /></div>
+          <div className="flex flex-1 flex-col">{children}</div>
         </Providers>
       </body>
     </html>
