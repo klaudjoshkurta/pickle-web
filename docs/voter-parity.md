@@ -42,7 +42,7 @@ The origin must be localhost or 127.0.0.1. Set `PICKLE_BROWSER_CHANNEL=chrome` t
 
 ## Intentional differences and limits
 
-Web voting remains account-free through Supabase anonymous authentication, with optional email login. Realtime/polling and browser share/copy are retained web adaptations. Creating/managing polls, templates, and notifications remain Android features. Closed results show immediately, without replay, reopening, sudden death, backer lists, or downloadable cards.
+Web voting remains account-free through Supabase anonymous authentication, with optional email login. Realtime/polling and browser share/copy are retained web adaptations. Creating/managing polls, templates, and notifications are now also implemented on the web; see [creator parity](creator-parity.md). Closed results show immediately, without replay, reopening, sudden death, backer lists, or downloadable cards.
 
 The production schema, grants, and ballot function were inspected read-only. Fixture checks do not replace a final cross-client smoke test with a dedicated test account and disposable poll. No production deployment, live vote, or database migration was performed.
 

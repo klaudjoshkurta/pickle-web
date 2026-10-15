@@ -39,7 +39,7 @@ const en = {
     "Dinner, movie night, or the next trip? Make a poll in Pickle, drop the link in your chat, and let everyone have a say.",
   ctaAndroid: "Get Pickle for Android",
   ctaHow: "See how it works",
-  heroNote: "Create polls in the Android app. Friends vote in their browser.",
+  heroNote: "Create polls on the web or Android. Friends vote in their browser.",
 
   // Landing — demo poll
   demoQuestion: "The important question: which pizza?",
@@ -51,7 +51,7 @@ const en = {
   // Landing — how it works
   howTitle: "Ask. Share. Decide.",
   step1Title: "Start with a question",
-  step1Body: "Create a poll in the Pickle Android app. Add your options and choose whether friends can suggest more.",
+  step1Body: "Create a poll on the web or in the Pickle Android app. Add your options and choose whether friends can suggest more.",
   step2Title: "Send it to the chat",
   step2Body: "Share your poll link wherever your group talks. Friends open it and vote. No app download needed.",
   step3Title: "Make the call",
@@ -81,7 +81,7 @@ const en = {
   navCookies: "Cookies",
 
   // Footer banner on poll pages
-  footerText: "Create your own polls with the Pickle app",
+  footerText: "Create your own polls with Pickle",
   footerCta: "Get it on Google Play",
 
   // States
@@ -238,7 +238,7 @@ const el: Messages = {
     "Φαγητό, ταινία ή η επόμενη εκδρομή; Φτιάξε μια ψηφοφορία στο Pickle, στείλε τον σύνδεσμο στο chat και δώσε σε όλους λόγο στην απόφαση.",
   ctaAndroid: "Pickle για Android",
   ctaHow: "Δες πώς λειτουργεί",
-  heroNote: "Φτιάξε ψηφοφορίες στην εφαρμογή Android. Η παρέα ψηφίζει από τον browser.",
+  heroNote: "Φτιάξε ψηφοφορίες στο web ή στο Android. Η παρέα ψηφίζει από τον browser.",
 
   demoQuestion: "Το μεγάλο δίλημμα: ποια πίτσα;",
   demoOption1: "Πεπερόνι",
@@ -248,7 +248,7 @@ const el: Messages = {
 
   howTitle: "Μια ερώτηση. Μια κοινή απόφαση.",
   step1Title: "Ξεκίνα με μια ερώτηση",
-  step1Body: "Φτιάξε μια ψηφοφορία στην εφαρμογή Pickle για Android. Βάλε τις επιλογές σου και διάλεξε αν η παρέα μπορεί να προτείνει κι άλλες.",
+  step1Body: "Φτιάξε μια ψηφοφορία στο web ή στην εφαρμογή Pickle για Android. Βάλε τις επιλογές σου και διάλεξε αν η παρέα μπορεί να προτείνει κι άλλες.",
   step2Title: "Στείλε τη στο chat",
   step2Body: "Μοιράσου τον σύνδεσμο εκεί που μιλάτε. Οι φίλοι σου τον ανοίγουν και ψηφίζουν, χωρίς να κατεβάσουν εφαρμογή.",
   step3Title: "Πάρτε την απόφαση",
@@ -275,7 +275,7 @@ const el: Messages = {
   navPrivacy: "Πολιτική απορρήτου",
   navCookies: "Cookies",
 
-  footerText: "Φτιάξε τις δικές σου ψηφοφορίες με την εφαρμογή Pickle",
+  footerText: "Φτιάξε τις δικές σου ψηφοφορίες με το Pickle",
   footerCta: "Διαθέσιμο στο Google Play",
 
   loading: "Φόρτωση ψηφοφορίας…",
