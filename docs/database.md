@@ -1,9 +1,9 @@
 # Shared database setup and validation
 
 The web app supports voting at `/p/[pollId]`. Poll creation, moderation, and
-management are available on the web at `/app` and in Android. The existing Supabase migrations and SQL
+management are available in Android. The existing Supabase migrations and SQL
 validation scripts are retained because they describe shared database behavior.
-Both clients use the same existing database functions; this creator update applies no schema migrations.
+The web voter uses existing database functions; removing management UI requires no schema migration.
 
 ## Migrations
 

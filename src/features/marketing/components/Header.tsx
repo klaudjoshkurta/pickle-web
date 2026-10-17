@@ -20,7 +20,6 @@ export function Header({ landing = false }: { landing?: boolean }) {
           <Link href="/blog" className={buttonClass("text")}>{t("navBlog")}</Link>
           <Link href="/changelog" className={buttonClass("text")}>{t("navChangelog")}</Link>
         </nav>
-        <Link href="/app" className={buttonClass("outline")}>{t("openPickle")}</Link>
         <a href={PLAY_STORE_URL} aria-label={t("footerCta")} className={buttonClass("primary", "px-4")}>
           <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5 shrink-0"><path d="M4 3.5a1 1 0 0 1 1.5-.86l14.4 8.5a1 1 0 0 1 0 1.72L5.5 21.36A1 1 0 0 1 4 20.5z" /></svg>
           Google Play

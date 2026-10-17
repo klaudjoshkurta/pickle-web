@@ -1,5 +1,4 @@
 "use client";
-import Link from "next/link";
 import { PLAY_STORE_URL } from "@/lib/config";
 
 import { dicebearUrl } from "@/lib/avatars";
@@ -43,7 +42,7 @@ function Hero() {
         <h1 className="headline-pop mt-5 text-5xl leading-[1.02] sm:text-6xl lg:text-7xl">{t("heroTitle")}</h1>
         <p className="mt-5 max-w-xl text-lg text-ink-muted">{t("heroBody")}</p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <Link href="/app" className={buttonClass("primary", "min-h-14 px-7 text-lg")}>{t("newPoll")}</Link>
+          <a href={PLAY_STORE_URL} className={buttonClass("primary", "min-h-14 px-7 text-lg")}>{t("ctaAndroid")}</a>
           <a href="#how" className={buttonClass("text", "min-h-14 px-7 text-lg")}>
             {t("ctaHow")}
           </a>

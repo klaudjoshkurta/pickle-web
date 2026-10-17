@@ -28,9 +28,7 @@ export const architecture = {
           const forbidden =
             (shared && /^(app|features|domain)\//.test(to)) ||
             (from.startsWith("domain/") && /^(app|features|components|lib)\//.test(to)) ||
-            (from.startsWith("features/") && to.startsWith("app/")) ||
-            (from.startsWith("features/polls/") && to.startsWith("features/creator/")) ||
-            (from.startsWith("features/marketing/") && to.startsWith("features/creator/"));
+            (from.startsWith("features/") && to.startsWith("app/"));
           if (forbidden) context.report({ node: node.source, messageId: "boundary", data: { from, to } });
         }
         return { ImportDeclaration: check, ExportNamedDeclaration: check, ExportAllDeclaration: check, ImportExpression: check };

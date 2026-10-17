@@ -281,25 +281,3 @@ body {
 @media (max-width: 360px) {
   .poll-theme .app-dialog [role="radiogroup"] { grid-template-columns: repeat(4, minmax(44px, 1fr)); }
 }
-
-/* Creator screens share the Android theme with public poll pages. */
-.creator-main { overflow-wrap: anywhere; }
-.creator-main :is(input, textarea, select) { max-width: 100%; }
-.creator-main :is(select, textarea) { color: var(--color-ink); background: var(--color-paper); }
-.creator-main select { padding-right: 2rem; }
-.creator-icon-link { display: inline-flex; align-items: center; justify-content: center; gap: 2px; min-width: 44px; height: 44px; border: 1.5px solid var(--color-line-strong); border-radius: 999px; }
-.creator-icon-link:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 4px; }
-.creator-move { min-width: 44px; min-height: 44px; border-radius: 12px; color: var(--color-ink-muted); }
-.creator-move:disabled { opacity: .35; }
-.creator-move:focus-visible { outline: 2px solid var(--color-primary); }
-.creator-main .creator-avatars button { min-height: 0; }
-.poll-theme input[role="switch"] { appearance: none; flex-shrink: 0; width: 48px; height: 28px; border: 1.5px solid var(--color-line-strong); border-radius: 999px; background: var(--color-surface-variant); padding: 3px; cursor: pointer; }
-.poll-theme input[role="switch"]::before { content: ""; display: block; width: 19px; height: 19px; border-radius: 999px; background: var(--color-paper); box-shadow: 0 0 0 1px var(--color-line-strong); }
-.poll-theme input[role="switch"]:checked { background: var(--color-primary); }
-.poll-theme input[role="switch"]:checked::before { transform: translateX(18px); }
-.poll-theme input[role="switch"]:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 4px; }
-.poll-theme input[role="switch"]:disabled { opacity: .5; cursor: default; }
-@media (max-width: 360px) {
-  .creator-main .creator-avatars { grid-template-columns: repeat(4, minmax(44px, 1fr)); }
-  .creator-header > div { width: 100%; justify-content: flex-end; }
-}

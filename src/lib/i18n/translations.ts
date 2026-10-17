@@ -2,9 +2,6 @@ export type Locale = "en" | "el";
 export const LOCALES: Locale[] = ["en", "el"];
 
 const en = {
-  myPolls: "My polls",
-  openPickle: "Open Pickle",
-  newPoll: "New poll",
   avatarRequired: "Pick your face before continuing.",
   pickAnOption: "Pick an option", pickSeveral: "Pick one or more",
   voteForOption: "Vote for {option}", changeToOption: "Change to {option}",
@@ -205,9 +202,6 @@ export type PluralKey = {
 }[keyof Messages];
 
 const el: Messages = {
-  myPolls: "Οι ψηφοφορίες μου",
-  openPickle: "Άνοιγμα Pickle",
-  newPoll: "Νέα ψηφοφορία",
   avatarRequired: "Διάλεξε ένα avatar για να συνεχίσεις.",
   pickAnOption: "Διάλεξε μια επιλογή", pickSeveral: "Διάλεξε μία ή περισσότερες",
   voteForOption: "Ψήφισε {option}", changeToOption: "Αλλαγή σε {option}",

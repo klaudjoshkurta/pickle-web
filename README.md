@@ -1,6 +1,6 @@
 # Pickle web
 
-The web app for **Pickle** group polls. Create and manage polls at `/app` or in the Android app, then share `https://pickle-web-iota.vercel.app/p/{pollId}`. Voters can vote, see results and suggest options in their browser without installing anything.
+The web app for **Pickle** group polls. Create and manage polls in the Android app, then share `https://pickle-web-iota.vercel.app/p/{pollId}`. Voters can vote, see results and suggest options in their browser without installing anything.
 
 - Next.js 16 (App Router) + React 19 + TypeScript + Tailwind CSS v4
 - Supabase JS v2, talking directly to the existing project (no custom backend)
@@ -13,14 +13,7 @@ map, feature ownership, route layouts, and validation workflow.
 
 | Path | What it shows |
 | --- | --- |
-| `/` | Landing page with web creator and Android app entry points |
-| `/app` | Creator welcome, first-run guide, My polls, and recent settled polls |
-| `/app/login`, `/app/signup` | Email/password authentication and four-step signup |
-| `/app/new` | Editable blank, starter, or template draft |
-| `/app/templates`, `/app/closed` | Personal templates, six starters, and closed poll history |
-| `/app/notifications`, `/app/account` | Inbox, profile, statistics, and sign out |
-| `/app/demo` | Read-only sample polls without creating a guest session |
-| `/app/share?poll=<id>` | Created-poll share confirmation |
+| `/` | Landing page with Android app entry points |
 | `/p/:pollId` | The poll: vote, results, suggestions, share |
 | `/blog` | Published articles, in English and Greek with English fallback |
 | `/blog/:slug` | A published blog article |
@@ -86,7 +79,7 @@ No `_redirects` or `vercel.json` rewrite is needed on either platform.
 - **Data** ([src/features/polls/pollApi.ts](src/features/polls/pollApi.ts)): loads the poll, its ordered options, the user's complete ballot, and their legacy single vote in parallel. Votes go through the `cast_ballot` RPC, and its exceptions map to friendly messages.
 - **Live updates** ([src/features/polls/usePoll.ts](src/features/polls/usePoll.ts)): a Supabase Realtime channel on `polls` and `poll_options` for this poll, with 10s polling as a fallback and a refresh when the tab becomes visible again.
 - **Visibility rules** ([src/domain/polls/pollLogic.ts](src/domain/polls/pollLogic.ts)): approved options for everyone, plus the voter's own pending suggestions. Results are hidden until the voter votes unless `show_results_before_voting` is set or the poll is closed.
-- **Strings**: shared copy is in [src/lib/i18n/translations.ts](src/lib/i18n/translations.ts); creator-specific copy lives in [src/features/creator/copy.ts](src/features/creator/copy.ts).
+- **Strings**: shared copy is in [src/lib/i18n/translations.ts](src/lib/i18n/translations.ts).
 
 ## Design
 
@@ -113,12 +106,6 @@ Public poll pages follow the current Android implementation and its handoff READ
 - Identity uses ten Notionists avatar choices. New identities require an explicit face selection; shuffling clears it. Existing names and avatars are preserved. Forms use bottom sheets on phones and modal dialogs on desktop.
 - A successful write followed by a failed refresh shows a Saved message and Refresh action. Refresh never repeats the write. Account changes clear in-progress selections.
 
-Intentional web differences: link recipients can vote through persisted anonymous sessions, with optional email authentication; Android requires an account. Web keeps realtime updates with polling fallback and Web Share with clipboard fallback. Creator features are now also available on the web; see [creator implementation and validation](docs/creator-parity.md). Reopening, sudden death, result replays, backer lists, and image-card downloads are not implemented by this update.
+Intentional web differences: link recipients can vote through persisted anonymous sessions, with optional email authentication; Android requires an account. Web keeps realtime updates with polling fallback and Web Share with clipboard fallback. Reopening, sudden death, result replays, backer lists, and image-card downloads are not implemented by this update.
 
 No production data mutations or schema changes are needed for this client update. The target deployment's ballot contract was checked read-only; see [shared database notes](docs/database.md).
-
-## Web creator features
-
-Open `/app` for the creator experience: email signup/login, first-run guidance, owned polls, closed history, editable poll creation, six starters, personal templates, notifications, profile, and sign out. Poll owners also receive moderation, End voting confirmation, and Save as template controls on shared poll pages. Anonymous link voting remains supported.
-
-See [creator parity and validation](docs/creator-parity.md) for the shared data contracts, draft/retry behavior, screenshots, isolated browser harness, and deployment auth-return configuration. Validation passed: 44 unit/API tests, lint, production build, and both creator/public-voter browser suites. No production deployment or data mutation was performed during validation.

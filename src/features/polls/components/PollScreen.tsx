@@ -20,16 +20,7 @@ import { StatusPills } from "./StatusPills";
 import { PendingList, SuggestCard } from "./SuggestCard";
 import { VoteList } from "./VoteList";
 
-export interface OwnerControlsProps {
-  poll: PollBundle["poll"];
-  options: PollBundle["options"];
-  refetch: () => Promise<boolean>;
-  onClosed: () => void;
-}
-
-type OwnerControlsComponent = React.ComponentType<OwnerControlsProps>;
-
-export function PollScreen({ pollId, ownerControls }: { pollId: string; ownerControls?: OwnerControlsComponent }) {
+export function PollScreen({ pollId }: { pollId: string }) {
   const { t } = useI18n();
   const auth = useAuth();
   const { state, refetch, retry } = usePoll(pollId, auth.ready, auth.user?.id ?? null);
@@ -40,9 +31,9 @@ export function PollScreen({ pollId, ownerControls }: { pollId: string; ownerCon
   if (state.kind === "notFound") return <Unavailable />;
   if (state.kind === "error") return <ErrorState onRetry={retry} />;
   if (state.data.options.filter((o) => o.status === "APPROVED").length < 2) return <Unavailable />;
-  return <PollView key={pollId + ":" + auth.user?.id} data={state.data} refetch={refetch} ownerControls={ownerControls} />;
+  return <PollView key={pollId + ":" + auth.user?.id} data={state.data} refetch={refetch} />;
 }
-function PollView({ data, refetch, ownerControls: OwnerControls }: { data: PollBundle; refetch: () => Promise<boolean>; ownerControls?: OwnerControlsComponent }) {
+function PollView({ data, refetch }: { data: PollBundle; refetch: () => Promise<boolean> }) {
   const { t } = useI18n();
   const { user, profile, requireProfile } = useAuth();
   const toast = useToast();
@@ -50,10 +41,7 @@ function PollView({ data, refetch, ownerControls: OwnerControls }: { data: PollB
   const actionsRef = useRef<HTMLDivElement>(null);
   const active = useRef(true);
   useEffect(() => { active.current = true; return () => { active.current = false; }; }, []);
-  const { poll: remotePoll, options } = data;
-  const [closedLocally, setClosedLocally] = useState(false);
-  const poll = closedLocally ? { ...remotePoll, status: "CLOSED" as const } : remotePoll;
-  const isOwner = user?.id === poll.creator_id && !user?.is_anonymous;
+  const { poll, options } = data;
   const [picked, setPicked] = useState<string[] | null>(null);
   const [changing, setChanging] = useState(false);
   const [voting, setVoting] = useState(false);
@@ -144,9 +132,8 @@ function PollView({ data, refetch, ownerControls: OwnerControls }: { data: PollB
       </>}
       {poll.expected_voters != null && poll.expected_voters > 0 && <div className="text-sm text-ink-muted"><p>{t("votedOfExpected", { x: total, n: poll.expected_voters })}</p><progress aria-label={t("turnout")} value={Math.min(total, poll.expected_voters)} max={poll.expected_voters} className="mt-2 h-2 w-full accent-primary" /></div>}
     </section>}
-    {!isOwner && <PendingList options={pending} />}
+    <PendingList options={pending} />
     {isOpen && poll.allow_suggestions && <SuggestCard existing={options.filter((o) => o.status !== "REJECTED")} requireApproval={poll.require_approval} avatarUrl={profile.avatarUrl} onSubmit={suggest} disabled={refreshFailed} />}
-    {isOwner && OwnerControls && <OwnerControls poll={poll} options={options} refetch={refetch} onClosed={()=>setClosedLocally(true)} />}
     <ShareBar pollId={poll.id} question={poll.question} closed={!isOpen} />
   </article>;
 }
