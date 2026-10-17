@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Header } from "@/features/marketing/components/Header";
+import { SiteFooter } from "@/components/layout/SiteFooter";
+import { Header } from "@/components/layout/Header";
 import { buttonClass } from "@/components/ui/Button";
 
 export default function NotFound() {
@@ -15,6 +16,7 @@ export default function NotFound() {
           </Link>
         </div>
       </main>
+      <SiteFooter />
     </>
   );
 }

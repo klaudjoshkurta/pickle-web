@@ -75,9 +75,9 @@ No `_redirects` or `vercel.json` rewrite is needed on either platform.
 
 ## How it works
 
-- **Auth** ([src/features/auth/AuthContext.tsx](src/features/auth/AuthContext.tsx)): restores the persisted session (localStorage) or calls `signInAnonymously()`. Before the first vote or suggestion it asks for a display name and a DiceBear avatar, stored with `updateUser({ data: { display_name, avatar_url } })`.
-- **Data** ([src/features/polls/pollApi.ts](src/features/polls/pollApi.ts)): loads the poll, its ordered options, the user's complete ballot, and their legacy single vote in parallel. Votes go through the `cast_ballot` RPC, and its exceptions map to friendly messages.
-- **Live updates** ([src/features/polls/usePoll.ts](src/features/polls/usePoll.ts)): a Supabase Realtime channel on `polls` and `poll_options` for this poll, with 10s polling as a fallback and a refresh when the tab becomes visible again.
+- **Auth** ([src/components/providers/AuthContext.tsx](src/components/providers/AuthContext.tsx)): restores the persisted session (localStorage) or calls `signInAnonymously()`. Before the first vote or suggestion it asks for a display name and a DiceBear avatar, stored with `updateUser({ data: { display_name, avatar_url } })`.
+- **Data** ([src/features/polls/api/pollApi.ts](src/features/polls/api/pollApi.ts)): loads the poll, its ordered options, the user's complete ballot, and their legacy single vote in parallel. Votes go through the `cast_ballot` RPC, and its exceptions map to friendly messages.
+- **Live updates** ([src/features/polls/hooks/usePoll.ts](src/features/polls/hooks/usePoll.ts)): a Supabase Realtime channel on `polls` and `poll_options` for this poll, with 10s polling as a fallback and a refresh when the tab becomes visible again.
 - **Visibility rules** ([src/domain/polls/pollLogic.ts](src/domain/polls/pollLogic.ts)): approved options for everyone, plus the voter's own pending suggestions. Results are hidden until the voter votes unless `show_results_before_voting` is set or the poll is closed.
 - **Strings**: shared copy is in [src/lib/i18n/translations.ts](src/lib/i18n/translations.ts).
 

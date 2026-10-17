@@ -24,11 +24,11 @@ export const architecture = {
               : null;
           if (!target) return;
           const to = relativeSource(target);
-          const shared = from.startsWith("components/") || from.startsWith("lib/");
+          const shared = from.startsWith("components/ui/") || from.startsWith("lib/");
           const forbidden =
             (shared && /^(app|features|domain)\//.test(to)) ||
             (from.startsWith("domain/") && /^(app|features|components|lib)\//.test(to)) ||
-            (from.startsWith("features/") && to.startsWith("app/"));
+            (/^(features|components)\//.test(from) && to.startsWith("app/"));
           if (forbidden) context.report({ node: node.source, messageId: "boundary", data: { from, to } });
         }
         return { ImportDeclaration: check, ExportNamedDeclaration: check, ExportAllDeclaration: check, ImportExpression: check };

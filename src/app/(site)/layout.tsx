@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
-import { Providers } from "@/app/_components/Providers";
+import { Providers } from "@/components/providers/Providers";
 import "../globals.css";
 
 const rubik = localFont({ src: "../../../public/fonts/Rubik.ttf", variable: "--font-rubik", weight: "400 900", display: "swap" });

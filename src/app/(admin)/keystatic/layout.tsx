@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import KeystaticApp from "./keystatic";
+import KeystaticApp from "@/components/admin/Keystatic";
 
 export default function KeystaticLayout({ children }: { children: React.ReactNode }) {
   return <>
